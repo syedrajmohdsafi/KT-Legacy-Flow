@@ -18,7 +18,16 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: 'dist',
       emptyOutDir: true,
-      sourcemap: false
+      sourcemap: false,
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            vendor: ['react', 'react-dom', 'react-router-dom'],
+            d3: ['d3'],
+            genai: ['@google/genai']
+          }
+        }
+      }
     }
   };
 });
