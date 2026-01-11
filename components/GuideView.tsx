@@ -417,14 +417,14 @@ const GuideView: React.FC = () => {
                 <p className="text-indigo-400 text-[10px] font-bold uppercase tracking-[0.3em] mt-2">Visual Instructional Guide</p>
               </div>
               <div className="glass rounded-[2.5rem] overflow-hidden border border-white/10 shadow-2xl relative aspect-video bg-black">
-                <iframe 
+                <video 
                   className="w-full h-full"
-                  src="https://www.youtube.com/embed/W9kTd7q1zjE" 
-                  title="Salah Prayer Method"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                ></iframe>
+                  controls
+                  playsInline
+                  src="./assets/videos/Hazrat-Peer-o-Murshid-practical-tareeqe.mp4"
+                >
+                  Your browser does not support the video tag.
+                </video>
               </div>
               <p className="text-center text-slate-500 text-[10px] font-black uppercase tracking-widest mt-6">Complete step-by-step demonstration for all believers.</p>
             </div>
