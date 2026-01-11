@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
 <script type="importmap">
 {
   "imports": {
@@ -21,6 +22,11 @@
   }
 }
 </script>
+  <script type="module" crossorigin src="./assets/index-CzjVaYFO.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/vendor-C2XVzSep.js">
+  <link rel="modulepreload" crossorigin href="./assets/d3-CJdOZvCZ.js">
+  <link rel="modulepreload" crossorigin href="./assets/genai-CwAtwoSX.js">
+  <link rel="stylesheet" crossorigin href="./assets/index-BDJ830fw.css">
 </head>
 <body class="h-full">
     <div id="root"></div>
@@ -34,12 +40,23 @@
 
     <!-- Error Handler to show runtime errors on screen -->
     <script>
+        // Catch synchronous errors
         window.addEventListener('error', function(event) {
             const msg = document.getElementById('loading-message');
             const errDisp = document.getElementById('error-display');
             if (msg && errDisp) {
                 errDisp.style.display = 'block';
                 errDisp.innerText = 'Error: ' + event.message;
+            }
+        });
+
+        // Catch Promise rejections (async errors)
+        window.addEventListener('unhandledrejection', function(event) {
+            const msg = document.getElementById('loading-message');
+            const errDisp = document.getElementById('error-display');
+            if (msg && errDisp) {
+                errDisp.style.display = 'block';
+                errDisp.innerText = 'Async Error: ' + (event.reason ? event.reason.message : 'Unknown reason');
             }
         });
         
@@ -55,7 +72,6 @@
     </script>
 
     <!-- Vite Entry Point -->
-    <script type="module" src="./index.tsx"></script>
     
     <script>
         // Simple script to hide loading message when React mounts
