@@ -42,6 +42,16 @@
                 errDisp.innerText = 'Error: ' + event.message;
             }
         });
+        
+        // Timeout check to warn if scripts fail to load entirely
+        setTimeout(() => {
+            const root = document.getElementById('root');
+            const errDisp = document.getElementById('error-display');
+            if (root && root.childElementCount === 0 && errDisp && errDisp.style.display === 'none') {
+                errDisp.style.display = 'block';
+                errDisp.innerText = 'Timeout: Application script failed to initialize. Check console for 404s or network errors.';
+            }
+        }, 5000);
     </script>
 
     <!-- Vite Entry Point -->
