@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en" class="h-full">
 <head>
@@ -41,21 +40,52 @@
                 stroke-dashoffset: 0;
             }
         }
+        #loading-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #94a3b8;
+            font-family: 'Inter', sans-serif;
+        }
     </style>
 <script type="importmap">
 {
   "imports": {
-    "react/": "https://esm.sh/react@^19.2.3/",
     "react": "https://esm.sh/react@^19.2.3",
-    "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
     "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "react-router-dom": "https://esm.sh/react-router-dom@^7.11.0",
-    "d3": "https://esm.sh/d3@^7.9.0"
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "@google/genai": "https://esm.sh/@google/genai@^1.35.0",
+    "d3": "https://esm.sh/d3@^7.9.0",
+    "react-router-dom": "https://esm.sh/react-router-dom@^7.12.0",
+    "vite": "https://esm.sh/vite@^7.3.1",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2"
   }
 }
 </script>
 </head>
 <body class="h-full">
     <div id="root"></div>
+    
+    <!-- This message helps debug deployment issues. It disappears automatically when the app loads. -->
+    <div id="loading-message">
+        <h2 class="text-xl font-bold mb-2">Loading Application...</h2>
+        <p class="text-sm opacity-75">If this message stays for more than a few seconds on GitHub Pages,<br>ensure you have uploaded the <strong>dist</strong> folder (Build Output), not the source code.</p>
+    </div>
+
+    <!-- Vite Entry Point -->
+    <script type="module" src="/index.tsx"></script>
+    
+    <script>
+        // Simple script to hide loading message when React mounts
+        const observer = new MutationObserver((mutations) => {
+            if (document.getElementById('root').childElementCount > 0) {
+                const msg = document.getElementById('loading-message');
+                if (msg) msg.style.display = 'none';
+            }
+        });
+        observer.observe(document.getElementById('root'), { childList: true });
+    </script>
 </body>
 </html>

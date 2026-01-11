@@ -7,13 +7,6 @@ import { TreeType } from './types';
 import { PATERNAL_ANCESTRY, MATERNAL_ANCESTRY, SHAJRA_DATA } from './constants';
 import { speakText, playRawPCM } from './services/geminiService';
 
-// Declare window.aistudio interface
-declare global {
-  interface Window {
-    aistudio?: any;
-  }
-}
-
 const HomeView: React.FC = () => {
   const tiles = [
     { 
@@ -176,8 +169,9 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const checkKey = async () => {
-      if (window.aistudio) {
-        const hasKey = await window.aistudio.hasSelectedApiKey();
+      const win = window as any;
+      if (win.aistudio) {
+        const hasKey = await win.aistudio.hasSelectedApiKey();
         setApiKeyReady(hasKey);
       } else {
         // In dev/other environments without aistudio, we assume key is handled externally
@@ -189,9 +183,10 @@ const App: React.FC = () => {
   }, []);
 
   const requestKey = async () => {
-    if (window.aistudio) {
+    const win = window as any;
+    if (win.aistudio) {
       try {
-        await window.aistudio.openSelectKey();
+        await win.aistudio.openSelectKey();
         setApiKeyReady(true); // Optimistic update as per instructions
       } catch (e) {
         console.error(e);
@@ -203,8 +198,9 @@ const App: React.FC = () => {
     return <div className="h-full w-full bg-[#020617] flex items-center justify-center text-slate-500 font-mono text-xs">Initializing Secure Environment...</div>;
   }
 
+  const win = window as any;
   // API Key Protection Screen
-  if (!apiKeyReady && window.aistudio) {
+  if (!apiKeyReady && win.aistudio) {
     return (
       <div className="h-full w-full bg-[#020617] flex flex-col items-center justify-center p-8 text-center space-y-8 animate-in fade-in duration-700">
          <div className="space-y-4">
