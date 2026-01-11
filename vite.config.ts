@@ -13,9 +13,7 @@ export default defineConfig(({ mode }) => {
     base: './', 
     define: {
       // Correctly map process.env.API_KEY to the loaded environment variable
-      'process.env.API_KEY': JSON.stringify(env.API_KEY || env.GEMINI_API_KEY || ''),
-      // Prevent crash if other process.env props are accessed, but don't overwrite the whole object
-      'process.env': {} 
+      'process.env.API_KEY': JSON.stringify(env.API_KEY || env.GEMINI_API_KEY || '')
     },
     build: {
       outDir: 'dist',
