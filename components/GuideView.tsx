@@ -421,7 +421,7 @@ const GuideView: React.FC = () => {
                   className="w-full h-full"
                   controls
                   playsInline
-                  src="./assets/videos/Hazrat-Peer-o-Murshid-practical-tareeqe.mp4"
+                  src="./videos/Hazrat-Peer-o-Murshid-practical-tareeqe.mp4"
                 >
                   Your browser does not support the video tag.
                 </video>
