@@ -441,7 +441,7 @@ const GuideView: React.FC = () => {
                     playsInline
                     preload="auto"
                     onError={handleVideoError}
-                    src="./videos/Hazrat-Peer-o-Murshid-practical-tareeqe.mp4"
+                    src="./public/videos/hazrat-peer-o-murshid-practical-tareeqe.mp4"
                   >
                     Your browser does not support the video tag.
                   </video>
