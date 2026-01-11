@@ -4,52 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Legacy Flow</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0f172a;
-            color: #f8fafc;
-            margin: 0;
-            overflow-x: hidden;
-            height: 100%;
-        }
-        #root {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-        .glass {
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .node-circle {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .link {
-            stroke-dasharray: 1000;
-            stroke-dashoffset: 1000;
-            animation: dash 2s ease-out forwards;
-        }
-        @keyframes dash {
-            to {
-                stroke-dashoffset: 0;
-            }
-        }
-        #loading-message {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            color: #94a3b8;
-            font-family: 'Inter', sans-serif;
-        }
-    </style>
 <script type="importmap">
 {
   "imports": {
@@ -70,8 +27,8 @@
     
     <!-- This message helps debug deployment issues. It disappears automatically when the app loads. -->
     <div id="loading-message">
-        <h2 class="text-xl font-bold mb-2">Loading Application...</h2>
-        <p class="text-sm opacity-75">If this message stays for more than a few seconds on GitHub Pages,<br>ensure you have uploaded the <strong>dist</strong> folder (Build Output), not the source code.</p>
+        <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; color: white;">Loading Application...</h2>
+        <p style="font-size: 0.875rem; opacity: 0.75; color: #94a3b8;">If this message stays for more than a few seconds,<br>ensure you have uploaded the <strong>dist</strong> folder.</p>
     </div>
 
     <!-- Vite Entry Point -->
@@ -85,7 +42,8 @@
                 if (msg) msg.style.display = 'none';
             }
         });
-        observer.observe(document.getElementById('root'), { childList: true });
+        const root = document.getElementById('root');
+        if(root) observer.observe(root, { childList: true });
     </script>
 </body>
 </html>

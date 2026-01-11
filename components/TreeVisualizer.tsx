@@ -1,10 +1,11 @@
-
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import * as d3 from 'd3';
 import { Person, TreeType } from '../types';
 import { generateNodeBio } from '../services/geminiService';
 
-interface ExtendedPerson extends Person {
+// Fix TS2430: We use Omit to remove the original 'children' definition from Person
+// so we can redefine it to allow 'null' (which D3 uses for collapsed nodes).
+interface ExtendedPerson extends Omit<Person, 'children'> {
   isRevealed?: boolean;
   _children?: ExtendedPerson[] | null;
   children?: ExtendedPerson[] | null;
@@ -28,7 +29,10 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ data, type }) => {
 
   // Helper to prepare nested data structure
   const prepareData = useCallback((node: Person): ExtendedPerson => {
-    const newNode: ExtendedPerson = { ...node, isRevealed: false };
+    // Cast to ExtendedPerson immediately to handle the type overwrite
+    const newNode = { ...node } as ExtendedPerson;
+    newNode.isRevealed = false;
+
     if (node.children && node.children.length > 0) {
       newNode._children = node.children.map(child => prepareData(child));
       newNode.children = null; 
@@ -50,10 +54,6 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ data, type }) => {
   useEffect(() => {
     const prepared = prepareData(data);
     prepared.isRevealed = true;
-    
-    // Auto-reveal root children if root is revealed (optional but good for UX)
-    // However, logic below mainly handles click expansion. 
-    // To ensure consistency, let's keep initial state simple.
     
     setRootData(prepared);
     setSelectedNode(prepared);
