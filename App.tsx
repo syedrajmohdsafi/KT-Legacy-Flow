@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect, useRef } from 'react';
 import { HashRouter, Routes, Route, Link } from 'react-router-dom';
 import Layout from './components/Layout';
 import TreeVisualizer from './components/TreeVisualizer';
@@ -75,23 +76,20 @@ const FamilyView: React.FC = () => {
   return (
     <div className="flex flex-col h-[calc(100vh-64px)] w-full overflow-hidden bg-slate-950">
       
-      {/* Top Bar for Family View */}
-      <div className="flex items-center justify-between px-4 py-3 md:px-8 md:py-4 border-b border-white/5 bg-slate-900/50 backdrop-blur-sm z-10 shrink-0">
-        <h2 className="text-lg md:text-2xl font-black text-white hidden md:block">Bloodline</h2>
-        
-        {/* Mobile-optimized Toggle */}
-        <div className="flex w-full md:w-auto bg-slate-950 p-1 rounded-xl border border-white/10">
+      {/* Top Bar for Family View - Now centered */}
+      <div className="flex items-center justify-center px-4 py-3 md:px-8 md:py-4 border-b border-white/5 bg-slate-900/50 backdrop-blur-sm z-10 shrink-0">
+        <div className="flex w-full md:w-auto bg-slate-950 p-1 rounded-xl border border-white/10 max-w-lg shadow-inner">
           <button 
             onClick={() => setActiveTab('paternal')} 
-            className={`flex-1 md:flex-none px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'paternal' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
+            className={`flex-1 md:px-8 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'paternal' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
           >
             Paternal
           </button>
           <button 
             onClick={() => setActiveTab('maternal')} 
-            className={`flex-1 md:flex-none px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'maternal' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
+            className={`flex-1 md:px-8 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'maternal' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
           >
-            Maternal
+            Family Tree (نسب نامہ)
           </button>
         </div>
       </div>
@@ -106,6 +104,39 @@ const FamilyView: React.FC = () => {
 
 const SilsilaView: React.FC = () => {
   const [loadingAudio, setLoadingAudio] = useState<string | null>(null);
+  const [activeSubtitleIdx, setActiveSubtitleIdx] = useState(-1);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Expanded Time-coded Translation Data
+  const translations = [
+    { start: 0, end: 5, text: "In the name of Allah, the Most Gracious, the Most Merciful" },
+    { start: 5, end: 12, text: "My body is the Murshid's body, my heart is the Murshid's heart" },
+    { start: 12, end: 18, text: "My soul is the Murshid's soul, my manifest is the Murshid's manifest" },
+    { start: 18, end: 24, text: "My hidden is the Murshid's hidden, my sight is the Murshid's sight" },
+    { start: 24, end: 32, text: "O Allah! Bless our Master Muhammad, the Master of Lovers" },
+    { start: 32, end: 40, text: "Bless our Master Muhammad, the Master of those who Answer" },
+    { start: 40, end: 48, text: "Bless our Master Muhammad, the Master of the Divine Messengers" },
+    { start: 48, end: 55, text: "Bless our Master Muhammad, the Master of the Steadfast" },
+    { start: 55, end: 65, text: "O Allah, by the sanctity of 'There is no god but Allah, Adam is the Pure one of Allah'" },
+    { start: 65, end: 75, text: "O Allah, by the sanctity of 'There is no god but Allah, Noah is the Prophet of Allah'" },
+    { start: 75, end: 85, text: "O Allah, by the sanctity of 'There is no god but Allah, Ibrahim is the Friend of Allah'" },
+    { start: 85, end: 95, text: "O Allah, by the sanctity of 'There is no god but Allah, Musa is the Interlocutor of Allah'" },
+    { start: 95, end: 110, text: "O Allah, by the sanctity of 'There is no god but Allah, Isa is the Spirit of Allah'" },
+    { start: 110, end: 130, text: "O Allah, by the sanctity of 'There is no god but Allah, Muhammad is the Messenger of Allah'" },
+    { start: 130, end: 155, text: "Invoking the sanctity of Hazrat Meera Syed Muhammad Mahdi Mauood (A.S)" },
+    { start: 155, end: 180, text: "Invoking the sanctity of Hazrat Bandagi Miyan Syed Mahmood Sani Mahdi (R.A)" },
+    { start: 180, end: 205, text: "Invoking the sanctity of Hazrat Bandagi Miyan Shah Yaqub Hasani Wilayat (R.A)" },
+    { start: 205, end: 246, text: "Continuing the sacred chain of spiritual transmission and blessings..." }
+  ];
+
+  const handleTimeUpdate = () => {
+    if (!videoRef.current) return;
+    const time = videoRef.current.currentTime;
+    const idx = translations.findIndex(s => time >= s.start && time <= s.end);
+    if (idx !== activeSubtitleIdx) {
+      setActiveSubtitleIdx(idx);
+    }
+  };
 
   const handleRecite = async (text: string, id: string) => {
     if (loadingAudio !== null) return;
@@ -157,6 +188,70 @@ const SilsilaView: React.FC = () => {
               </div>
             </div>
           ))}
+
+          {/* Updated Video Section with Live Translation Panel */}
+          <div className="mt-16 pt-12 border-t border-white/10 relative">
+            <div className="absolute inset-x-0 -top-24 h-48 bg-emerald-500/10 blur-[100px] pointer-events-none rounded-full animate-pulse"></div>
+            
+            <div className="text-center mb-8">
+              <h3 className="text-3xl font-black text-white tracking-tighter uppercase">Recitation Archive - Silsila in mothers voice</h3>
+              <p className="text-emerald-400 text-[10px] font-bold uppercase tracking-[0.3em] mt-2">Historical Audio Preservation</p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
+              {/* Video Player Area */}
+              <div className="relative group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-emerald-600 to-blue-600 rounded-3xl blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
+                <div className="relative glass rounded-3xl overflow-hidden border border-white/10 shadow-2xl aspect-video bg-black/60 flex flex-col justify-center">
+                  <video 
+                    ref={videoRef}
+                    onTimeUpdate={handleTimeUpdate}
+                    className="w-full h-full object-contain"
+                    controls
+                    playsInline
+                    preload="metadata"
+                    src="videos/Silsila-mothers-voice.mp4"
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+              </div>
+
+              {/* Live Translation Panel Area */}
+              <div className="glass rounded-3xl border border-white/5 p-6 flex flex-col gap-4 bg-slate-900/40 relative overflow-hidden">
+                <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                  <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Live Translation Display</span>
+                  <div className={`w-2 h-2 rounded-full ${activeSubtitleIdx >= 0 ? 'bg-emerald-500 animate-pulse' : 'bg-slate-700'}`}></div>
+                </div>
+                
+                <div className="flex-1 overflow-y-auto custom-scrollbar space-y-3 max-h-[250px] pr-2">
+                  {translations.map((t, idx) => (
+                    <div 
+                      key={idx}
+                      className={`p-4 rounded-2xl border transition-all duration-300 ${idx === activeSubtitleIdx ? 'bg-emerald-600/20 border-emerald-500/50 scale-[1.02] shadow-lg' : 'bg-white/5 border-transparent opacity-40'}`}
+                    >
+                      <p className={`text-sm md:text-base font-medium leading-relaxed ${idx === activeSubtitleIdx ? 'text-white' : 'text-slate-400'}`}>
+                        {t.text}
+                      </p>
+                    </div>
+                  ))}
+                  {activeSubtitleIdx === -1 && (
+                    <div className="h-full flex items-center justify-center text-slate-600 text-[10px] font-black uppercase tracking-widest text-center py-12">
+                      Play video to sync translation
+                    </div>
+                  )}
+                </div>
+
+                <div className="absolute bottom-0 inset-x-0 h-12 bg-gradient-to-t from-slate-900 to-transparent pointer-events-none"></div>
+              </div>
+            </div>
+
+            <div className="mt-8 flex items-center justify-center gap-4 text-slate-500 text-[10px] font-black uppercase tracking-widest">
+              <div className="h-px flex-1 bg-white/5"></div>
+              <span>Digital Archive • Silsila Recitation</span>
+              <div className="h-px flex-1 bg-white/5"></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -174,7 +269,6 @@ const App: React.FC = () => {
         const hasKey = await win.aistudio.hasSelectedApiKey();
         setApiKeyReady(hasKey);
       } else {
-        // In dev/other environments without aistudio, we assume key is handled externally
         setApiKeyReady(true);
       }
       setChecking(false);
@@ -187,7 +281,7 @@ const App: React.FC = () => {
     if (win.aistudio) {
       try {
         await win.aistudio.openSelectKey();
-        setApiKeyReady(true); // Optimistic update as per instructions
+        setApiKeyReady(true);
       } catch (e) {
         console.error(e);
       }
@@ -199,7 +293,6 @@ const App: React.FC = () => {
   }
 
   const win = window as any;
-  // API Key Protection Screen
   if (!apiKeyReady && win.aistudio) {
     return (
       <div className="h-full w-full bg-[#020617] flex flex-col items-center justify-center p-8 text-center space-y-8 animate-in fade-in duration-700">

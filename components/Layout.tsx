@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
@@ -27,7 +26,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
              </button>
            )}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center font-bold text-white text-[10px] shadow-lg shadow-blue-900/50 group-hover:scale-105 transition-transform">LF</div>
+            {/* LOGO AREA: KT Logo */}
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center font-bold text-white text-[10px] shadow-lg shadow-blue-900/50 group-hover:scale-105 transition-transform">KT</div>
             <span className="font-black text-white tracking-tight text-lg">Legacy<span className="text-blue-500">Flow</span></span>
           </Link>
         </div>
