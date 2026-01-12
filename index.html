@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
 <script type="importmap">
 {
   "imports": {
@@ -21,7 +22,11 @@
   }
 }
 </script>
-<link rel="stylesheet" href="/index.css">
+  <script type="module" crossorigin src="./assets/index-Cw9fSuRr.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/vendor-C2XVzSep.js">
+  <link rel="modulepreload" crossorigin href="./assets/d3-CJdOZvCZ.js">
+  <link rel="modulepreload" crossorigin href="./assets/genai-CwAtwoSX.js">
+  <link rel="stylesheet" crossorigin href="./assets/index-B42CjjZ_.css">
 </head>
 <body class="h-full">
     <div id="root"></div>
@@ -67,7 +72,6 @@
     </script>
 
     <!-- Vite Entry Point -->
-    <script type="module" src="./index.tsx"></script>
     
     <script>
         // Simple script to hide loading message when React mounts
@@ -80,6 +84,5 @@
         const root = document.getElementById('root');
         if(root) observer.observe(root, { childList: true });
     </script>
-<script type="module" src="/index.tsx"></script>
 </body>
 </html>
