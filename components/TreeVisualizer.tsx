@@ -23,13 +23,13 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ data, type }) => {
   
   const [selectedNode, setSelectedNode] = useState<ExtendedPerson | null>(null);
   const [isSpouseSelected, setIsSpouseSelected] = useState(false);
+  const [isPanelExpanded, setIsPanelExpanded] = useState(false);
   const [loadingAi, setLoadingAi] = useState(false);
   const [aiInsight, setAiInsight] = useState('');
   const [isInitialRender, setIsInitialRender] = useState(true);
 
   // Helper to prepare nested data structure
   const prepareData = useCallback((node: Person): ExtendedPerson => {
-    // Cast to ExtendedPerson immediately to handle the type overwrite
     const newNode = { ...node } as ExtendedPerson;
     newNode.isRevealed = false;
 
@@ -116,9 +116,7 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ data, type }) => {
     const theme = { color: '#3b82f6', bg: '#1d4ed8' };
     const isMobile = width < 768;
     
-    // Increased horizontal gap to prevent overlapping branch names
-    const horizontalGap = isMobile ? 450 : 850; 
-    // Reduced vertical gap significantly to decrease line length
+    const horizontalGap = isMobile ? 650 : 1350; 
     const verticalGap = isMobile ? 250 : 400;
 
     const treeLayout = d3.tree<ExtendedPerson>().nodeSize([horizontalGap, verticalGap]);
@@ -126,8 +124,7 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ data, type }) => {
     setCurrentHierarchy(root);
 
     if (isInitialRender) {
-      // Reduced initial scale for better overview
-      const initialScale = isMobile ? 0.45 : 0.65;
+      const initialScale = isMobile ? 0.35 : 0.5;
       const initialTransform = d3.zoomIdentity
         .translate(width / 2, height / 3) 
         .scale(initialScale);
@@ -201,7 +198,6 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ data, type }) => {
           .attr('stroke-width', 4)
           .attr('class', 'node-circle shadow-xl');
 
-        // Logic for Text Tag inside the circle
         let nodeTag = '?';
         if (isRevealed) {
             if (side === 'main') {
@@ -240,18 +236,13 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ data, type }) => {
         const labelText = d.data.spouse ? `${d.data.name} & ${d.data.spouse}` : d.data.name;
         
         let displayRole = d.data.role || 'Descendant';
-        // Map short codes to full role names for the text label below the node
         if (displayRole === 'S') displayRole = 'Son';
         else if (displayRole === 'D') displayRole = 'Daughter';
         else if (displayRole === 'Root') displayRole = 'Root Ancestor';
 
-        // Calculated offsets for spacing control
-        // Increase space between Node and Role
         const roleYOffset = circleRadius + (isMobile ? 50 : 65);
-        // Decrease space between Role and Name
         const nameYOffset = roleYOffset + (isMobile ? 22 : 28);
 
-        // Role Label - Positioned ABOVE name (Just below node)
         nodeGroup.append('text')
           .attr('dy', roleYOffset)
           .attr('text-anchor', 'middle')
@@ -260,7 +251,6 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ data, type }) => {
           .attr('font-weight', '700')
           .text(displayRole);
 
-        // Name Label - Positioned BELOW role
         nodeGroup.append('text')
           .attr('dy', nameYOffset)
           .attr('text-anchor', 'middle')
@@ -276,27 +266,18 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ data, type }) => {
   const handleNodeClick = useCallback(async (event: any, d: d3.HierarchyPointNode<ExtendedPerson>, side: 'main' | 'spouse' = 'main') => {
     event.stopPropagation();
     
-    // Toggle Children
     if (d.data.children) {
-      // Collapse
       d.data._children = d.data.children;
       d.data.children = null;
     } else if (d.data._children) {
-      // Expand
       d.data.children = d.data._children;
       d.data._children = null;
-      
-      // Reveal the clicked node (just in case)
       d.data.isRevealed = true;
-      
-      // Auto-reveal all children so their names appear immediately
       if (d.data.children) {
           d.data.children.forEach(child => {
               child.isRevealed = true;
           });
       }
-
-      // Close siblings to keep tree clean
       if (d.parent && d.parent.children) {
          d.parent.children.forEach((siblingNode) => {
            const sibling = siblingNode.data;
@@ -313,7 +294,7 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ data, type }) => {
     setIsSpouseSelected(side === 'spouse');
     setAiInsight('');
     
-    // Zoom to a readable scale, not too close (Reduced from 1.3 to 0.9)
+    // Zoom to node but DO NOT auto-expand the side panel
     centerNode(d.x, d.y, 0.9);
 
     setLoadingAi(true);
@@ -328,7 +309,7 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ data, type }) => {
       }
     }
     setLoadingAi(false);
-  }, [type, centerNode, rootData]);
+  }, [centerNode, rootData]);
 
   useEffect(() => {
     renderTree();
@@ -347,7 +328,7 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ data, type }) => {
         <svg ref={svgRef} className="w-full h-full cursor-grab active:cursor-grabbing" style={{ touchAction: 'none' }} />
       </div>
       
-      {/* Controls */}
+      {/* Zoom Controls */}
       <div className="absolute bottom-6 left-6 md:bottom-8 md:left-8 flex flex-col gap-3 z-10 pointer-events-auto">
         <button 
           onClick={jumpToTop} 
@@ -365,38 +346,57 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ data, type }) => {
         </button>
       </div>
 
-      {/* Detail Panel */}
+      {/* Sliding Detail Drawer */}
       {selectedNode && (
-        <div className="absolute right-0 top-0 bottom-0 md:w-[400px] w-full pointer-events-none flex flex-col justify-end md:justify-start">
-          
-          {/* Desktop Close Button - Positioned absolutely within the panel wrapper, independent of scrolling */}
-          <div className="hidden md:block absolute top-4 right-4 z-50 pointer-events-auto">
-              <button 
-                onClick={() => setSelectedNode(null)} 
-                className="p-2 bg-black/40 hover:bg-red-500/80 text-slate-400 hover:text-white rounded-full transition-all backdrop-blur-md border border-white/10 shadow-lg"
-                title="Close Details"
-              >
-                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-              </button>
+        <div 
+          className={`absolute right-0 top-0 bottom-0 md:w-[400px] w-full z-40 transition-transform duration-500 ease-in-out flex ${isPanelExpanded ? 'translate-x-0' : 'translate-x-full'}`}
+        >
+          {/* Toggle Handle (Arrow Button) */}
+          <div className="absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 flex items-center">
+            <button
+              onClick={() => setIsPanelExpanded(!isPanelExpanded)}
+              className="flex items-center gap-2 px-4 py-6 bg-slate-900/90 border border-white/10 backdrop-blur-xl rounded-l-3xl shadow-[-10px_0_30px_rgba(0,0,0,0.5)] group hover:bg-blue-600 transition-colors"
+            >
+              <div className={`transition-transform duration-500 ${isPanelExpanded ? 'rotate-180' : 'rotate-0'}`}>
+                <svg className="w-5 h-5 text-blue-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M15 19l-7-7 7-7" />
+                </svg>
+              </div>
+              {!isPanelExpanded && (
+                <span className="[writing-mode:vertical-lr] text-[10px] font-black uppercase tracking-widest text-slate-400 group-hover:text-white whitespace-nowrap">
+                  Show Details
+                </span>
+              )}
+            </button>
           </div>
 
-          <div className="pointer-events-auto bg-slate-900/95 md:bg-slate-900/80 backdrop-blur-xl border-t md:border-l border-white/10 h-[50vh] md:h-full p-6 overflow-y-auto flex flex-col gap-6 rounded-t-3xl md:rounded-none shadow-2xl transition-transform duration-500">
-             
-             <div className="md:hidden flex justify-center pb-2">
-                <div className="w-12 h-1.5 bg-slate-700 rounded-full"></div>
+          {/* Panel Content */}
+          <div className="w-full bg-slate-900/95 md:bg-slate-900/90 backdrop-blur-2xl border-l border-white/10 h-full p-6 overflow-y-auto flex flex-col gap-6 shadow-2xl">
+             <div className="flex justify-between items-start">
+                <div className="flex-1">
+                  <h3 className="text-xl font-black text-white">{displayPerson.name}</h3>
+                  <p className="text-[10px] text-blue-500 font-bold uppercase tracking-widest">Selected Record</p>
+                </div>
+                <button 
+                  onClick={() => setIsPanelExpanded(false)} 
+                  className="p-2 text-slate-400 hover:text-white transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
              </div>
 
-             <div className="flex justify-between items-start md:hidden">
-                <h3 className="text-xl font-black text-white">{displayPerson.name}</h3>
-                <button onClick={() => setSelectedNode(null)} className="p-2 text-slate-400 hover:text-white"><svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-             </div>
-
-             <div className="w-full aspect-square rounded-2xl overflow-hidden border-2 border-slate-700 bg-slate-800 shadow-xl shrink-0 max-h-64 md:max-h-80 mx-auto">
-               <img src={displayPerson.image || `https://picsum.photos/seed/${displayPerson.name}/400/400`} className="w-full h-full object-cover" alt={displayPerson.name} />
+             <div className="w-full aspect-square rounded-2xl overflow-hidden border-2 border-slate-700 bg-slate-800 shadow-xl shrink-0 max-h-64 md:max-h-80">
+               <img 
+                 src={displayPerson.image || `https://picsum.photos/seed/${displayPerson.name}/400/400`} 
+                 className="w-full h-full object-cover" 
+                 alt={displayPerson.name} 
+               />
              </div>
 
              <div className="space-y-4">
-                <div className="hidden md:block text-center md:text-left">
+                <div>
                     <h3 className="text-3xl font-black text-white leading-tight">{displayPerson.name}</h3>
                     {displayPerson.urduName && (
                         <p className="text-2xl font-serif text-blue-400 rtl leading-tight mt-2">{displayPerson.urduName}</p>
@@ -411,7 +411,7 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ data, type }) => {
                            <div className="h-2 bg-slate-700 rounded"></div>
                        </div>
                    ) : (
-                       <p>{aiInsight || "No record available."}</p>
+                       <p>{aiInsight || "No record available in current scroll."}</p>
                    )}
                 </div>
              </div>
