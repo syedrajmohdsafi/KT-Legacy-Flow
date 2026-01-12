@@ -7,60 +7,47 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
 <script type="importmap">
 {
   "imports": {
-    "react": "https://esm.sh/react@^19.2.3",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "react/": "https://esm.sh/react@^19.2.3/",
     "@google/genai": "https://esm.sh/@google/genai@^1.35.0",
-    "d3": "https://esm.sh/d3@^7.9.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
     "react-router-dom": "https://esm.sh/react-router-dom@^7.12.0",
-    "vite": "https://esm.sh/vite@^7.3.1",
-    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2"
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2",
+    "d3": "https://esm.sh/d3@^7.9.0",
+    "vite": "https://esm.sh/vite@^7.3.1"
   }
 }
 </script>
-  <script type="module" crossorigin src="./assets/index-Cw9fSuRr.js"></script>
-  <link rel="modulepreload" crossorigin href="./assets/vendor-C2XVzSep.js">
-  <link rel="modulepreload" crossorigin href="./assets/d3-CJdOZvCZ.js">
-  <link rel="modulepreload" crossorigin href="./assets/genai-CwAtwoSX.js">
-  <link rel="stylesheet" crossorigin href="./assets/index-B42CjjZ_.css">
 </head>
 <body class="h-full">
     <div id="root"></div>
     
-    <!-- Loading / Debug Message -->
     <div id="loading-message">
         <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; color: white;">Loading Application...</h2>
         <p style="font-size: 0.875rem; opacity: 0.75; color: #94a3b8;">If this message stays for more than a few seconds,<br>ensure you have uploaded the <strong>dist</strong> folder.</p>
         <div id="error-display" style="color: #f87171; margin-top: 1rem; font-family: monospace; font-size: 0.75rem; text-align: left; background: rgba(0,0,0,0.2); padding: 0.5rem; border-radius: 0.25rem; display: none;"></div>
     </div>
 
-    <!-- Error Handler to show runtime errors on screen -->
     <script>
-        // Catch synchronous errors
         window.addEventListener('error', function(event) {
-            const msg = document.getElementById('loading-message');
             const errDisp = document.getElementById('error-display');
-            if (msg && errDisp) {
+            if (errDisp) {
                 errDisp.style.display = 'block';
                 errDisp.innerText = 'Error: ' + event.message;
             }
         });
 
-        // Catch Promise rejections (async errors)
         window.addEventListener('unhandledrejection', function(event) {
-            const msg = document.getElementById('loading-message');
             const errDisp = document.getElementById('error-display');
-            if (msg && errDisp) {
+            if (errDisp) {
                 errDisp.style.display = 'block';
                 errDisp.innerText = 'Async Error: ' + (event.reason ? event.reason.message : 'Unknown reason');
             }
         });
         
-        // Timeout check to warn if scripts fail to load entirely
         setTimeout(() => {
             const root = document.getElementById('root');
             const errDisp = document.getElementById('error-display');
@@ -68,13 +55,12 @@
                 errDisp.style.display = 'block';
                 errDisp.innerText = 'Timeout: Application script failed to initialize. Check console for 404s or network errors.';
             }
-        }, 5000);
+        }, 8000);
     </script>
 
-    <!-- Vite Entry Point -->
+    <script type="module" src="./index.tsx"></script>
     
     <script>
-        // Simple script to hide loading message when React mounts
         const observer = new MutationObserver((mutations) => {
             if (document.getElementById('root').childElementCount > 0) {
                 const msg = document.getElementById('loading-message');

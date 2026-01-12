@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { HashRouter, Routes, Route, Link } from 'react-router-dom';
 import Layout from './components/Layout';
@@ -46,7 +45,6 @@ const HomeView: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
           {tiles.map((tile, i) => (
             <Link key={i} to={tile.to} className="group glass rounded-3xl p-8 border border-white/5 hover:border-white/20 transition-all flex flex-col justify-end h-72 relative overflow-hidden shadow-2xl">
-              {/* Background Image Layer */}
               <div className="absolute inset-0 z-0">
                 <img 
                   src={tile.image} 
@@ -55,8 +53,6 @@ const HomeView: React.FC = () => {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent"></div>
               </div>
-              
-              {/* Content Layer */}
               <div className="relative z-10 translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
                 <div className={`absolute -inset-4 bg-gradient-to-r ${tile.color} blur-2xl opacity-0 group-hover:opacity-20 transition duration-500 -z-10`}></div>
                 <span className="px-3 py-1 text-[9px] font-black uppercase text-white bg-white/10 backdrop-blur-md rounded-full mb-3 inline-block w-fit tracking-widest border border-white/10">{tile.label}</span>
@@ -75,8 +71,6 @@ const FamilyView: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'paternal' | 'maternal'>('paternal');
   return (
     <div className="flex flex-col h-[calc(100vh-64px)] w-full overflow-hidden bg-slate-950">
-      
-      {/* Top Bar for Family View - Now centered */}
       <div className="flex items-center justify-center px-4 py-3 md:px-8 md:py-4 border-b border-white/5 bg-slate-900/50 backdrop-blur-sm z-10 shrink-0">
         <div className="flex w-full md:w-auto bg-slate-950 p-1 rounded-xl border border-white/10 max-w-lg shadow-inner">
           <button 
@@ -93,8 +87,6 @@ const FamilyView: React.FC = () => {
           </button>
         </div>
       </div>
-
-      {/* Tree Container */}
       <div className="flex-1 relative w-full bg-[radial-gradient(circle_at_center,_#0f172a_0%,_#020617_100%)]">
         <TreeVisualizer data={activeTab === 'paternal' ? PATERNAL_ANCESTRY : MATERNAL_ANCESTRY} type={TreeType.FAMILY} />
       </div>
@@ -107,7 +99,7 @@ const SilsilaView: React.FC = () => {
   const [activeSubtitleIdx, setActiveSubtitleIdx] = useState(-1);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Expanded Time-coded Translation Data
+  // Extended Time-coded Translation Data covering the full video length
   const translations = [
     { start: 0, end: 5, text: "In the name of Allah, the Most Gracious, the Most Merciful" },
     { start: 5, end: 12, text: "My body is the Murshid's body, my heart is the Murshid's heart" },
@@ -126,7 +118,13 @@ const SilsilaView: React.FC = () => {
     { start: 130, end: 155, text: "Invoking the sanctity of Hazrat Meera Syed Muhammad Mahdi Mauood (A.S)" },
     { start: 155, end: 180, text: "Invoking the sanctity of Hazrat Bandagi Miyan Syed Mahmood Sani Mahdi (R.A)" },
     { start: 180, end: 205, text: "Invoking the sanctity of Hazrat Bandagi Miyan Shah Yaqub Hasani Wilayat (R.A)" },
-    { start: 205, end: 246, text: "Continuing the sacred chain of spiritual transmission and blessings..." }
+    { start: 205, end: 230, text: "Invoking the sanctity of Hazrat Bandagi Miyan Syed Khundmir Bara Banisrail (R.A)" },
+    { start: 230, end: 255, text: "Invoking the sanctity of Hazrat Bandagi Miyan Shah Nusrat Makhsoos-uz-Zaman (R.A)" },
+    { start: 255, end: 280, text: "Invoking the sanctity of Hazrat Bandagi Miyan Syed Sharif (R.A)" },
+    { start: 280, end: 305, text: "Invoking the sanctity of Hazrat Bandagi Miyan Syed Mubarak (R.A)" },
+    { start: 305, end: 330, text: "Invoking the sanctity of Hazrat Bandagi Miyan Syed Khuda Bakhsh (R.H)" },
+    { start: 330, end: 355, text: "Invoking the sanctity of Hazrat Bandagi Miyan Syed Najmuddin Shaheed Akbar (R.H)" },
+    { start: 355, end: 400, text: "Continuing the sacred chain of spiritual transmission and blessings..." }
   ];
 
   const handleTimeUpdate = () => {
@@ -189,7 +187,6 @@ const SilsilaView: React.FC = () => {
             </div>
           ))}
 
-          {/* Updated Video Section with Live Translation Panel */}
           <div className="mt-16 pt-12 border-t border-white/10 relative">
             <div className="absolute inset-x-0 -top-24 h-48 bg-emerald-500/10 blur-[100px] pointer-events-none rounded-full animate-pulse"></div>
             
@@ -199,7 +196,6 @@ const SilsilaView: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
-              {/* Video Player Area */}
               <div className="relative group">
                 <div className="absolute -inset-1 bg-gradient-to-r from-emerald-600 to-blue-600 rounded-3xl blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
                 <div className="relative glass rounded-3xl overflow-hidden border border-white/10 shadow-2xl aspect-video bg-black/60 flex flex-col justify-center">
@@ -217,14 +213,13 @@ const SilsilaView: React.FC = () => {
                 </div>
               </div>
 
-              {/* Live Translation Panel Area */}
               <div className="glass rounded-3xl border border-white/5 p-6 flex flex-col gap-4 bg-slate-900/40 relative overflow-hidden">
                 <div className="flex items-center justify-between border-b border-white/10 pb-3">
                   <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Live Translation Display</span>
                   <div className={`w-2 h-2 rounded-full ${activeSubtitleIdx >= 0 ? 'bg-emerald-500 animate-pulse' : 'bg-slate-700'}`}></div>
                 </div>
                 
-                <div className="flex-1 overflow-y-auto custom-scrollbar space-y-3 max-h-[250px] pr-2">
+                <div className="flex-1 overflow-y-auto custom-scrollbar space-y-3 max-h-[300px] pr-2">
                   {translations.map((t, idx) => (
                     <div 
                       key={idx}
@@ -241,7 +236,6 @@ const SilsilaView: React.FC = () => {
                     </div>
                   )}
                 </div>
-
                 <div className="absolute bottom-0 inset-x-0 h-12 bg-gradient-to-t from-slate-900 to-transparent pointer-events-none"></div>
               </div>
             </div>
@@ -300,7 +294,6 @@ const App: React.FC = () => {
              <h1 className="text-5xl font-black text-white tracking-tighter">Legacy <span className="text-blue-500">Flow</span></h1>
              <p className="text-slate-400 max-w-lg mx-auto text-lg">To access the ancestral archives and spiritual guides, please connect your secure API key.</p>
          </div>
-         
          <div className="flex flex-col items-center gap-5">
             <button 
               onClick={requestKey}
