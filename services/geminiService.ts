@@ -2,6 +2,38 @@ import { GoogleGenAI, Modality } from "@google/genai";
 
 let sharedAudioContext: AudioContext | null = null;
 
+// Helper to manually decode base64 as per instructions
+function decodeBase64(base64: string): Uint8Array {
+  const binaryString = atob(base64);
+  const len = binaryString.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes;
+}
+
+// Helper to decode raw 16-bit PCM into an AudioBuffer
+async function decodePCM(
+  data: Uint8Array,
+  ctx: AudioContext,
+  sampleRate: number,
+  numChannels: number,
+): Promise<AudioBuffer> {
+  const dataInt16 = new Int16Array(data.buffer);
+  const frameCount = dataInt16.length / numChannels;
+  const buffer = ctx.createBuffer(numChannels, frameCount, sampleRate);
+
+  for (let channel = 0; channel < numChannels; channel++) {
+    const channelData = buffer.getChannelData(channel);
+    for (let i = 0; i < frameCount; i++) {
+      // Convert 16-bit signed integer to float range [-1, 1]
+      channelData[i] = dataInt16[i * numChannels + channel] / 32768.0;
+    }
+  }
+  return buffer;
+}
+
 const getAudioContext = async () => {
   if (!sharedAudioContext) {
     sharedAudioContext = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
@@ -60,54 +92,37 @@ export async function speakText(text: string): Promise<string | null> {
         responseModalities: [Modality.AUDIO],
         speechConfig: {
           voiceConfig: {
+            // Voice names: 'Puck', 'Charon', 'Kore', 'Fenrir', 'Zephyr'
             prebuiltVoiceConfig: { voiceName: 'Kore' },
           },
         },
       },
     });
 
-    const audioData = response.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
-    if (audioData) return audioData;
-    throw new Error("Audio generation failed.");
+    const audioPart = response.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+    if (audioPart?.inlineData?.data) {
+      return audioPart.inlineData.data;
+    }
+    throw new Error("Audio generation failed: No audio data in response.");
   });
 }
 
 export async function playRawPCM(base64: string): Promise<void> {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const ctx = await getAudioContext();
-      if (ctx.state !== 'running') await ctx.resume();
+  const ctx = await getAudioContext();
+  
+  // Resuming context right away to satisfy browser user-gesture requirements
+  if (ctx.state === 'suspended') {
+    await ctx.resume();
+  }
 
-      const binaryString = atob(base64);
-      const len = binaryString.length;
-      const bytes = new Uint8Array(len);
-      for (let i = 0; i < len; i++) {
-        bytes[i] = binaryString.charCodeAt(i);
-      }
+  const audioBytes = decodeBase64(base64);
+  const audioBuffer = await decodePCM(audioBytes, ctx, 24000, 1);
 
-      const frameCount = Math.floor(len / 2);
-      if (frameCount <= 0) {
-        resolve();
-        return;
-      }
-
-      const buffer = ctx.createBuffer(1, frameCount, 24000);
-      const channelData = buffer.getChannelData(0);
-      const dataView = new DataView(bytes.buffer);
-
-      for (let i = 0; i < frameCount; i++) {
-        // Read 16-bit signed PCM data
-        channelData[i] = dataView.getInt16(i * 2, true) / 32768.0;
-      }
-
-      const source = ctx.createBufferSource();
-      source.buffer = buffer;
-      source.connect(ctx.destination);
-      source.onended = () => resolve();
-      source.start(0);
-    } catch (e) {
-      console.error("Playback error:", e);
-      reject(e);
-    }
+  return new Promise((resolve) => {
+    const source = ctx.createBufferSource();
+    source.buffer = audioBuffer;
+    source.connect(ctx.destination);
+    source.onended = () => resolve();
+    source.start(0);
   });
 }

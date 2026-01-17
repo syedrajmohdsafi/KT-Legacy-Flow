@@ -167,7 +167,7 @@ const SURAHS = [
   {
     name: "Surah Al-Humazah",
     meaning: "The Scorner",
-    arabic: "وَيْلٌ لِّكُلِّ هُمَزَةٍ لُّمَزَةٍ (1) الَّذِي جَمَعَ مَالًا وَعَدَّدَهُ (2) يَحْسَبُ أَنَّ مَالَهُ أَخْلَدَهُ (3) كَلَّا لَيُنبَذَنَّ فِي الْحُطَمَةِ (4) وَمَا أَدْرَاكَ مَا الْحُطَمَةُ (5) نَارُ اللَّهِ الْمُوقَدَةُ (6)",
+    arabic: "وَيْلٌ لِّكُلِّ هُمَزَةٍ لُّمَزَةٍ (1) الَّذِي جَمَعَ مَالًا وَعَدَّدَهُ (2) يَحْسَبُ أَنَّ مَالَهُ أَخْلَدَهُ (3) كَلَّا لَيُنبَذَنَّ فِي الْحُطَمَةِ (4) وَما أَدْراكَ مَا الْحُطَمَةُ (5) نَارُ اللَّهِ الْمُوقَدَةُ (6)",
     roman: "Wailul likulli humazatil lumazah. Alladhee jama'a maalanw wa 'addadah. Yahsabu anna maalahooo akhladah. Kallaa layumbadhanna fil hutamah. Wa maaa adraaka mal hutamah. Naarul laahil mooqadah."
   },
   {
@@ -229,12 +229,12 @@ const DAILY_PRAYERS = [
       { step: "Standing (Qiyam) & Sana", detail: "Fold hands below the navel, right hand over left wrist, and recite the Sana.", recitation: "سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ وَتَبَارَكَ اسْمُكَ وَتَعَالَى جَدُّكَ وَلَا إِلَهَ غَيْرُكَ" },
       { 
         step: "1st Rakat Recitation", 
-        detail: "Recite Surah Al-Fatiha followed by Ayah 135 of Surah Aal-Imran (from Page 23).", 
-        recitation: "وَالَّذِينَ إِذَا فَعَلُوا فَاحِشَةً أَوْ ظَلَمُوا أَنْفُسَهُمْ ذَكَرُوا اللَّهَ فَاسْتَغْفَرُوا لِذُنُوبِهِمْ وَمَنْ يَغْفِرُ الذُّنُوبَ إِلَّا اللَّهُ وَلَمْ يُصِرُّوا عَلَىٰ مَا فَعَلُوا وَهُمْ يَعْلَمُونَ"
+        detail: "Recite Surah Al-Fatiha followed by Ayah 135 of Surah Aal-Imran: وَالَّذِينَ إِذَا فَعَلُوا فَاحِشَةً أَوْ ظَلَمُوا أَنْفُسَهُمْ ذَكَرُوا اللَّهَ فَاسْتَغْفَرُوا لِذُنُوبِهِمْ وَمَنْ يَغْفِرُ الذُّنُوبَ إِلَّا اللَّهُ وَلَمْ يُصِرُّوا عَلَىٰ مَا فَعَلُوا وَهُمْ يَعْلَمُونَ", 
+        recitation: "وَالَّذِينَ إِذَا فَعَلُوا فَاحِشَةً أَوْ ظَلَمُوا أَنْفُسَهُمْ ذَكَرُوا اللَّهَ فَاسْتَغْفَرُوا لِذُنُوبِهِمْ وَمَنْ يَغْفِرُ الذُّنُوبَ إِلَّا اللَّهُ وَلَمْ يُصِرُّوا عَلَىٰ مَا فَعَلُوا وَهُمْ يَعْلَمُونَ"
       },
       { 
         step: "2nd Rakat Recitation", 
-        detail: "Recite Surah Al-Fatiha followed by Ayah 110 of Surah An-Nisa (from Page 25).", 
+        detail: "Recite Surah Al-Fatiha followed by Ayah 110 of Surah An-Nisa: وَمَنْ يَعْمَلْ سُوءًا أَوْ يَظْلِمْ نَفْسَهُ ثُمَّ يَسْتَغْفِرِ اللَّهَ يَجِدِ اللَّهَ غَفُورًا رَحِيمًا", 
         recitation: "وَمَنْ يَعْمَلْ سُوءًا أَوْ يَظْلِمْ نَفْسَهُ ثُمَّ يَسْتَغْفِرِ اللَّهَ يَجِدِ اللَّهَ غَفُورًا رَحِيمًا"
       },
       { step: "Completion", detail: "Finish with standard Tashahhud, Durood, and Salam.", recitation: "اَلسَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللهِ" }
@@ -336,7 +336,12 @@ const GuideView: React.FC = () => {
     try {
       const audio = await speakText(text);
       if (audio) await playRawPCM(audio);
-    } finally { setLoadingAudio(null); }
+    } catch (err) {
+      console.error("Recitation error:", err);
+      alert("Failed to play recitation. Please check your network or API key.");
+    } finally {
+      setLoadingAudio(null);
+    }
   };
 
   const handleVideoError = () => {
