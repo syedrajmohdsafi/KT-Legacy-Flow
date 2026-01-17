@@ -99,7 +99,7 @@ const SilsilaView: React.FC = () => {
   const [activeSubtitleIdx, setActiveSubtitleIdx] = useState(-1);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Extended Time-coded Translation Data covering the full video length
+  // Expanded translation list for the live display panel
   const translations = [
     { start: 0, end: 5, text: "In the name of Allah, the Most Gracious, the Most Merciful" },
     { start: 5, end: 12, text: "My body is the Murshid's body, my heart is the Murshid's heart" },
@@ -109,22 +109,22 @@ const SilsilaView: React.FC = () => {
     { start: 32, end: 40, text: "Bless our Master Muhammad, the Master of those who Answer" },
     { start: 40, end: 48, text: "Bless our Master Muhammad, the Master of the Divine Messengers" },
     { start: 48, end: 55, text: "Bless our Master Muhammad, the Master of the Steadfast" },
-    { start: 55, end: 65, text: "O Allah, by the sanctity of 'There is no god but Allah, Adam is the Pure one of Allah'" },
-    { start: 65, end: 75, text: "O Allah, by the sanctity of 'There is no god but Allah, Noah is the Prophet of Allah'" },
-    { start: 75, end: 85, text: "O Allah, by the sanctity of 'There is no god but Allah, Ibrahim is the Friend of Allah'" },
-    { start: 85, end: 95, text: "O Allah, by the sanctity of 'There is no god but Allah, Musa is the Interlocutor of Allah'" },
-    { start: 95, end: 110, text: "O Allah, by the sanctity of 'There is no god but Allah, Isa is the Spirit of Allah'" },
-    { start: 110, end: 130, text: "O Allah, by the sanctity of 'There is no god but Allah, Muhammad is the Messenger of Allah'" },
-    { start: 130, end: 155, text: "Invoking the sanctity of Hazrat Meera Syed Muhammad Mahdi Mauood (A.S)" },
-    { start: 155, end: 180, text: "Invoking the sanctity of Hazrat Bandagi Miyan Syed Mahmood Sani Mahdi (R.A)" },
-    { start: 180, end: 205, text: "Invoking the sanctity of Hazrat Bandagi Miyan Shah Yaqub Hasani Wilayat (R.A)" },
-    { start: 205, end: 230, text: "Invoking the sanctity of Hazrat Bandagi Miyan Syed Khundmir Bara Banisrail (R.A)" },
-    { start: 230, end: 255, text: "Invoking the sanctity of Hazrat Bandagi Miyan Shah Nusrat Makhsoos-uz-Zaman (R.A)" },
-    { start: 255, end: 280, text: "Invoking the sanctity of Hazrat Bandagi Miyan Syed Sharif (R.A)" },
-    { start: 280, end: 305, text: "Invoking the sanctity of Hazrat Bandagi Miyan Syed Mubarak (R.A)" },
-    { start: 305, end: 330, text: "Invoking the sanctity of Hazrat Bandagi Miyan Syed Khuda Bakhsh (R.H)" },
-    { start: 330, end: 355, text: "Invoking the sanctity of Hazrat Bandagi Miyan Syed Najmuddin Shaheed Akbar (R.H)" },
-    { start: 355, end: 400, text: "Continuing the sacred chain of spiritual transmission and blessings..." }
+    { start: 55, end: 65, text: "By the sanctity of 'There is no god but Allah, Adam is the Pure one of Allah'" },
+    { start: 65, end: 75, text: "By the sanctity of 'There is no god but Allah, Noah is the Prophet of Allah'" },
+    { start: 75, end: 85, text: "By the sanctity of 'There is no god but Allah, Ibrahim is the Friend of Allah'" },
+    { start: 85, end: 95, text: "By the sanctity of 'There is no god but Allah, Musa is the Interlocutor of Allah'" },
+    { start: 95, end: 110, text: "By the sanctity of 'There is no god but Allah, Isa is the Spirit of Allah'" },
+    { start: 110, end: 130, text: "By the sanctity of 'There is no god but Allah, Muhammad is the Messenger of Allah'" },
+    { start: 130, end: 155, text: "Hazrat Meera Syed Muhammad Mahdi Mauood (A.S)" },
+    { start: 155, end: 180, text: "Hazrat Bandagi Miyan Syed Mahmood Sani Mahdi (R.A)" },
+    { start: 180, end: 205, text: "Hazrat Bandagi Miyan Shah Yaqub Hasani Wilayat (R.A)" },
+    { start: 205, end: 230, text: "Hazrat Bandagi Miyan Syed Khundmir Bara Banisrail (R.A)" },
+    { start: 230, end: 255, text: "Hazrat Bandagi Miyan Shah Nusrat Makhsoos-uz-Zaman (R.A)" },
+    { start: 255, end: 280, text: "Hazrat Bandagi Miyan Syed Sharif (R.A)" },
+    { start: 280, end: 305, text: "Hazrat Bandagi Miyan Syed Mubarak (R.A)" },
+    { start: 305, end: 330, text: "Hazrat Bandagi Miyan Syed Khuda Bakhsh (R.H)" },
+    { start: 330, end: 355, text: "Hazrat Bandagi Miyan Syed Najmuddin Shaheed Akbar (R.H)" },
+    { start: 355, end: 500, text: "Continuing the sacred chain of spiritual transmission and blessings..." }
   ];
 
   const handleTimeUpdate = () => {
@@ -142,6 +142,8 @@ const SilsilaView: React.FC = () => {
     try {
       const audio = await speakText(text);
       if (audio) await playRawPCM(audio);
+    } catch (err) {
+      console.error("Recitation error:", err);
     } finally {
       setLoadingAudio(null);
     }

@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { speakText, playRawPCM } from '../services/geminiService';
 
@@ -33,7 +32,7 @@ const WAZU_STEPS = [
   { 
     name: "Nose", 
     detail: "Sniff water into the nostrils 3 times.", 
-    arabic: "اَللَّهُمَّ أَرِحْنِي رَائِحَةَ الْجَنَّةِ وَ أَنْتَ عَنِّي رَاضٍ",
+    arabic: "اَللَّهُمَّ أَرِحْنِي رَائِحَةَ الْجَنَّةِ وَ أَنْزِلْ عَلَيَّ مِنْ بَرَكَاتِكَ",
     roman: "Allahumma arihni ra'ihatal jannati wa anta 'anni radin.",
     img: "https://www.mymasjid.ca/wp-content/uploads/2016/10/wudu-into-nose.png" 
   },
@@ -75,7 +74,6 @@ const WAZU_STEPS = [
 ];
 
 const SURAHS = [
-  // User Requested Sequence
   {
     name: "Surah Al Fatiha",
     meaning: "The Opening",
@@ -85,7 +83,7 @@ const SURAHS = [
   {
     name: "Surah Attahiyyatu lillahi was-salawatu",
     meaning: "Tashahhud",
-    arabic: "التَّحِيَّاتُ لِلَّهِ وَالصَّلَوَاتُ وَالطَّيِّبَاتُ السَّلَامُ عَلَيْكَ أَيُّهَا النَّبِيُّ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ السَّلَامُ عَلَيْنَا وَعَلَى عِبَادِ اللَّهِ الصَّالِحِينَ أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ",
+    arabic: "التَّحِيَّاتُ لِلَّهِ وَالصَّلَوَاتُ وَالطَّيِّبَاتُ السَّلَامُ عَلَيْكَ أَيُّهَا النَّبِيُّ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ السَّلَامُ عَلَيْنَا وَعَلَى عِبَادِ اللَّهِ الصَّالِحِينَ أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَأَشْهَدُ أَنْ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ",
     roman: "Attahiyyatu lillahi was-salawatu wat-tayyibatu, as-salamu 'alaika ayyuhan-nabiyyu wa rahmatullahi wa barakatuhu, as-salamu 'alaina wa 'ala 'ibadillahis-salihin, ashhadu alla ilaha illallah wa ashhadu anna Muhammadan 'abduhu wa rasuluhu."
   },
   {
@@ -97,16 +95,15 @@ const SURAHS = [
   {
     name: "Surah Masoora",
     meaning: "Dua e Masoora",
-    arabic: "اللَّهُمَّ إِنِّي ظَلَمْتُ نَفْسِي ظُلْمًا كَثِيرًا وَلَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ فَاغْفِرْ لِي مَغْفِرَةً مِنْ عِنْدِكَ وَارْحَمْنِي إِنَّكَ أَنْتَ الْغَفُورُ الرَّحِيمُ",
+    arabic: "اللَّهُمَّ إِنِّي ظَلَمْتُ نَفْسِي ظُلْمًا كَثِيرًا وَلَا يَغْفِرُ الذُّنُوبَ إِلَّا أنتَ فَاغْفِرْ لِي مَغْفِرَةً مِنْ عِنْدِكَ وَارْحَمْنِي إِنَّكَ أَنْتَ الْغَفُورُ الرَّحِيمُ",
     roman: "Allahumma inni zalamtu nafsi zulman kathira wala yaghfiru dhunuba illa Anta faghfirli maghfiratan min 'Indika war-hamni innaka Antal Ghafurur Rahim."
   },
   {
     name: "Dua e qunoot",
     meaning: "Dua for Witr",
-    arabic: "اللَّهُمَّ إِنَّا نَسْتَعِينُكَ وَنَسْتَغْفِرُكَ وَنُؤْمِنُ بِكَ وَنَتَوَكَّلُ عَلَيْكَ وَنُثْنِي عَلَيْكَ الْخَيْرَ وَنَشْكُرُكَ وَلَا نَكْفُرُكَ وَنَخْلَعُ وَنَتْرُكُ مَنْ يَفْجُرُكَ. اللَّهُمَّ إِيَّاكَ نَعْبُدُ وَلَكَ نُصَلِّي وَنَسْجُدُ وَإِلَيْكَ نَسْعَى وَنَحْفِدُ نَرْجُو رَحْمَتَكَ وَنَخْشَى عَذَابَكَ إِنَّ عَذَابَكَ بِالْكُفَّارِ مُلْحِقٌ",
+    arabic: "اللَّهُمَّ إِنَّا نَسْتَعِينُكَ وَنَسْتَغْفِرُكَ وَنُؤْمِنُ بِكَ وَنَتَوَكَّلُ عَلَيْكَ وَنُثْنِي عَلَيْكَ الْخَيْرَ وَنَشْكُرُكَ وَلَا نَکْفُرُكَ وَنَخْلَعُ وَنَتْرُكُ مَنْ يَفْجُرُكَ. اللَّهُمَّ إِيَّاكَ نَعْبُدُ وَلَكَ نُصَلِّي وَنَسْجُدُ وَإِلَيْكَ نَسْعَى وَنَحْفِدُ نَرْجُو رَحْمَتَكَ وَنَخْشَى عَذَابَكَ إِنَّ عَذَابَكَ بِالْكُفَّارِ مُلْحِقٌ",
     roman: "Allahumma inna nasta'inuka wa nastaghfiruka wa nu'minu bika wa natawakkalu 'alaika wa nuthni 'alaikal-khaira wa nashkuruka wala nakfuruka wa nakhla'u wa natruku man yafjuruk. Allahumma lyyaka na'budu wa laka nusalli wa nasjudu wa lyaika nas'a wa nahfidu narju rahmataka wa nakhsha 'adhabaka inna 'adhabaka bil-kuffari mulhiq."
   },
-  // 18 Short Surahs
   {
     name: "Surah An-Nas",
     meaning: "The Mankind",
@@ -123,13 +120,13 @@ const SURAHS = [
     name: "Surah Al-Ikhlas",
     meaning: "The Sincerity",
     arabic: "قُلْ هُوَ اللَّهُ أَحَدٌ (1) اللَّهُ الصَّمَدُ (2) لَمْ يَلِدْ وَلَمْ يُولَدْ (3) وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ (4)",
-    roman: "Qul huwal laahu ahad. Allahus samad. Lam yalid wa lam yoolad. Wa lam yakul lahoo kufuwan ahad."
+    roman: "Qul huwal laahu ahad. Allahus samad. Lam yalid wa lang yoolad. Wa lakum yakul lahoo kufuwan ahad."
   },
   {
     name: "Surah Al-Masad",
     meaning: "The Palm Fiber",
-    arabic: "تَبَّتْ يَدَا أَبِي لَهَبٍ وَتَبَّ (1) مَا أَغْنَى عَنْهُ مَالُهُ وَمَا كَسَبَ (2) سَيَصْلَى نَارًا ذَاتَ لَهَبٍ (3) وَامْرَأَتُهُ حَمَّالَةَ الْحَطَبِ (4) فِي جِيدِهَا حَبْلٌ مِّن مَّسَدٍ (5)",
-    roman: "Tabbat yadaaa abee lahabiw wa tabb. Maa aghnaa 'anhu maaluhoo wa maa kasab. Saiyaslaa naaran dhaata lahab. Wamra'atuhoo hammaalatal hatab. Fee jeedihaa hablum mim masad."
+    arabic: "تَبَّتْ يَدَا أَبِي لَهَبٍ وَتَبَّ (1) مَا أَغْنَى عَنْهُ مَالُهُ وَمَا كَسَبَ (2) سَيَصْلَى نَارًا ذَاتَ لَهَبٍ (3) وَامْرَأَتُهُ حَمَّالَةَ الْقُطَبِ (4) فِي جِيدِهَا حَبْلٌ مِّن مَّسَدٍ (5)",
+    roman: "Tabbat yadaaa abee lahabiw wa tabb. Maa aghnaa 'anhu maaluhoo wa maa khab. Saiyaslaa naaran dhaata lahab. Wamra'atuhoo hammaalatal hatab. Fee jeedihaa hablum mim masad."
   },
   {
     name: "Surah An-Nasr",
@@ -140,7 +137,7 @@ const SURAHS = [
   {
     name: "Surah Al-Kafirun",
     meaning: "The Disbelievers",
-    arabic: "قُلْ يَا أَيُّهَا الْكَافِرُونَ (1) لَا أَعْبُدُ مَا تَعْبُدُونَ (2) وَلَا أَنتُمْ عَابِدُونَ مَا أَعْبُدُ (3) وَلَا أَنَا عَابِدٌ مَّا عَبَدتُّمْ (4) وَلَا أَنتُمْ عَابِدُونَ مَا أَعْبُدُ (5) لَكُمْ دِينُكُمْ وَلِيَ دِينِ (6)",
+    arabic: "قُلْ يَا أَيُّهَا الْكَافِرُونَ (1) لَا أَعْبُدُ مَا تَعْبُدُونَ (2) وَلَا أَنتُمْ عَابِدُونَ مَا أَعْبُدُ (3) وَلَا أَنَا عَابِدٌ مَّا عَدَتُّمْ (4) وَلَا أَنتُمْ عَابِدُونَ مَا أَعْبُدُ (5) لَكُمْ دِينُكُمْ وَلِيَ دِينِ (6)",
     roman: "Qul yaa ayyuhal kaafiroon. Laa a'budu maa ta'budoon. Wa laa antum 'aabidoona maaa a'bud. Wa laaa ana 'aabidum maa 'abattum. Wa laaa antum 'aabidoona maaa a'bud. Lakum deenukum wa liya deen."
   },
   {
@@ -218,6 +215,40 @@ const SURAHS = [
 ];
 
 const DAILY_PRAYERS = [
+  {
+    name: "Tahiyyatul-wazu",
+    time: "After Wazu",
+    rakats: "2 Rakat Nafl (Dugana)",
+    niyyah: {
+      arabic: "نَوَيْتُ أَنْ أُصَلِّيَ لِلَّهِ تَعَالَى رَكْعَتَيْنِ صَلَاةَ تَحِيَّةِ الْوُضُوءِ، شُكْرًا لِلَّهِ تَعَالَى مُتَابِعَةَ الْمَهْدِيِّ الْمَوْعُودِ مُتَوَجِّهًا إِلَى جِهَةِ الْكَعْبَةِ الشَّرِيفَةِ",
+      english: "I intend to perform 2 Rakats of Tahiyyatul-wazu as gratitude to Allah, following the Mahdi Al-Mau'ood (A.S.), facing the Honorable Kaaba."
+    },
+    tariqa: [
+      { step: "Facing Qibla & Niyyath", detail: "Stand facing the Qibla and make the intention (Niyyath) in your heart or tongue.", recitation: "نَوَيْتُ أَنْ أُصَلِّيَ..." },
+      { step: "Takbeer-e-Awwal", detail: "Raise hands like a duck's feet (fingers open naturally, palms to Qibla) so thumbs touch the earlobes.", recitation: "الله أكبر" },
+      { step: "Standing (Qiyam) & Sana", detail: "Fold hands below the navel, right hand over left wrist, and recite the Sana.", recitation: "سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ وَتَبَارَكَ اسْمُكَ وَتَعَالَى جَدُّكَ وَلَا إِلَهَ غَيْرُكَ" },
+      { 
+        step: "1st Rakat Recitation", 
+        detail: "Recite Surah Al-Fatiha followed by Ayah 135 of Surah Aal-Imran (from Page 23).", 
+        recitation: "وَالَّذِينَ إِذَا فَعَلُوا فَاحِشَةً أَوْ ظَلَمُوا أَنْفُسَهُمْ ذَكَرُوا اللَّهَ فَاسْتَغْفَرُوا لِذُنُوبِهِمْ وَمَنْ يَغْفِرُ الذُّنُوبَ إِلَّا اللَّهُ وَلَمْ يُصِرُّوا عَلَىٰ مَا فَعَلُوا وَهُمْ يَعْلَمُونَ"
+      },
+      { 
+        step: "2nd Rakat Recitation", 
+        detail: "Recite Surah Al-Fatiha followed by Ayah 110 of Surah An-Nisa (from Page 25).", 
+        recitation: "وَمَنْ يَعْمَلْ سُوءًا أَوْ يَظْلِمْ نَفْسَهُ ثُمَّ يَسْتَغْفِرِ اللَّهَ يَجِدِ اللَّهَ غَفُورًا رَحِيمًا"
+      },
+      { step: "Completion", detail: "Finish with standard Tashahhud, Durood, and Salam.", recitation: "اَلسَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللهِ" }
+    ],
+    sajdaDua: [
+      { 
+        step: "Sajda-e-Dua", 
+        detail: "After Salam, perform one Sajda and recite the following combined supplication.", 
+        recitation: "اللَّهُمَّ لَكَ سَجَدَ جِسْمِي، وَبِكَ آمَنَ قَلْبِي، وَلِسَانِي أَقَرَّ بِكَ. اللَّهُمَّ إِنِّي قَدْ أَذْنَبْتُ ذَنْبًا عَظِيمًا، وَلَا يَغْفِرُ الذَّنْبَ الْعَظِيمَ إِلَّا الرَّبُّ الْعَظِيمُ، لَا إِلَهَ إِلَّا الرَّبُّ الْعَظِيمُ.\n\nاللَّهُمَّ كَفَانِي مِنْ نَعِيمِ الدُّنْيَا مَحَبَّتُكَ وَالشَّوْقُ إِلَيْكَ وَذِكْرُكَ، وَكَفَانِي مِنْ نَعِيمِ الْآخِرَةِ رُؤْيَتُكَ وَرِضْوَانُكَ بِفَضْلِكَ وَكَرَمِكَ، يَا أَكْرَمَ الْأَكْرَمِينَ.",
+        roman: "Allahumma laka sajada jismi, wa bika amana qalbi, wa lisani aqarra bika. Allahumma inni qad adhnabtu dhanban 'azeeman, wa la yaghfiru adh-dhanba al-'azeema illa ar-Rabbu al-'Azeem, la ilaha illa ar-Rabbu al-'Azeem. Allahumma kafani min na'eemi ad-dunya mahabbatuka wash-shawqu ilayka wa dhikruka, wa kafani min na'eemi al-akhirati ruyatuka wa ridwanuka bi-fadlika wa karamika, ya akrama al-akrameen.",
+        meaning: "O Allah, my body has prostrated to You, my heart has believed in You, and my tongue has testified to You. O Allah, I am in a state where I have committed a great sin, and none can forgive a great sin except the Great Lord; there is no god but the Great Lord. O Allah, sufficient for me as a blessing in this world is Your love, the longing for You, and Your remembrance. And sufficient for me as a blessing in the Hereafter is the vision of You and Your pleasure, by Your grace and Your generosity, O Most Generous of the generous."
+      }
+    ]
+  },
   { 
     name: "Fajr", 
     time: "Before Sunrise", 
@@ -296,6 +327,7 @@ const GuideView: React.FC = () => {
   const [selectedPrayerIdx, setSelectedPrayerIdx] = useState(0);
   const [loadingAudio, setLoadingAudio] = useState<string | null>(null);
   const [videoError, setVideoError] = useState(false);
+  const [videoErrorMessage, setVideoErrorMessage] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const handleSpeak = async (text: string, id: string) => {
@@ -308,9 +340,15 @@ const GuideView: React.FC = () => {
   };
 
   const handleVideoError = () => {
-    if (videoRef.current) {
-        console.error("Video Error Details:", videoRef.current.error);
+    let msg = "The guide video could not be loaded.";
+    const videoElement = videoRef.current;
+    if (videoElement && videoElement.error) {
+        const error = videoElement.error;
+        const errorMsg = error.message ? String(error.message) : "Network or file issue";
+        msg = `Video Error (Code ${error.code}): ${errorMsg}`;
+        console.error("Video Error Details:", error);
     }
+    setVideoErrorMessage(msg);
     setVideoError(true);
   };
 
@@ -380,16 +418,17 @@ const GuideView: React.FC = () => {
 
         {activeTab === 'prayers' && (
           <div className="space-y-12 animate-in fade-in slide-in-from-bottom duration-500">
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            {/* Prayer Selection Bar: Horizontal Scroll on Mobile */}
+            <div className="flex flex-row flex-nowrap overflow-x-auto pb-4 gap-4 md:grid md:grid-cols-6 md:overflow-x-visible md:pb-0 snap-x scrollbar-hide">
               {DAILY_PRAYERS.map((p, i) => (
                 <button 
                   key={i} 
                   onClick={() => setSelectedPrayerIdx(i)}
-                  className={`relative glass rounded-2xl p-6 border transition-all text-left group overflow-hidden ${selectedPrayerIdx === i ? 'border-indigo-500 bg-indigo-500/10' : 'border-white/5 hover:border-white/20'}`}
+                  className={`relative glass rounded-2xl p-6 border transition-all text-left group overflow-hidden shrink-0 w-[200px] md:w-auto snap-center ${selectedPrayerIdx === i ? 'border-indigo-500 bg-indigo-500/10' : 'border-white/5 hover:border-white/20'}`}
                 >
-                  <h4 className="text-xl font-black text-white">{p.name}</h4>
+                  <h4 className="text-lg font-black text-white leading-tight">{p.name}</h4>
                   <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-4">{p.time}</p>
-                  <p className="text-[10px] text-indigo-400 font-black">{p.rakats}</p>
+                  <p className="text-[9px] text-indigo-400 font-black">{p.rakats}</p>
                   {selectedPrayerIdx === i && <div className="absolute top-2 right-2 text-indigo-500 animate-bounce"><svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5H7z"/></svg></div>}
                 </button>
               ))}
@@ -405,18 +444,69 @@ const GuideView: React.FC = () => {
               <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Tariqa for {selectedPrayer.name}</h3>
               {selectedPrayer.tariqa.map((step, i) => (
                 <div key={i} className="glass rounded-2xl p-6 border border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-6 group hover:border-indigo-500/30 animate-in fade-in zoom-in duration-300">
-                  <div className="space-y-2">
+                  <div className="space-y-2 flex-1">
                     <div className="flex items-center gap-4">
                       <span className="w-8 h-8 rounded-full bg-slate-800 border border-white/5 flex items-center justify-center text-[10px] font-black text-indigo-400">{i+1}</span>
                       <h3 className="text-xl font-black text-white group-hover:text-indigo-400 transition-colors">{step.step}</h3>
                     </div>
-                    <p className="text-sm text-slate-500 ml-12 font-medium">{step.detail}</p>
+                    <p className="text-sm text-slate-500 ml-12 font-medium leading-relaxed">{step.detail}</p>
+                    {/* Special display for recitations like Tahiyyatul-wazu's Ayahs */}
+                    {selectedPrayer.name === "Tahiyyatul-wazu" && step.step.includes("Recitation") && (
+                      <div className="ml-12 mt-4 p-5 bg-white/5 rounded-2xl border border-white/5 shadow-inner">
+                        <p className="text-2xl md:text-3xl font-serif text-white rtl text-right leading-loose">
+                          {step.recitation}
+                        </p>
+                        <p className="text-[10px] font-black text-indigo-500 uppercase tracking-widest mt-4">Visible Arabic Text for Step</p>
+                      </div>
+                    )}
                   </div>
-                  <button onClick={() => handleSpeak(step.recitation, `step-${i}`)} className="px-6 py-3 rounded-xl bg-slate-900 border border-white/5 text-[10px] font-black uppercase tracking-widest text-indigo-400 hover:bg-indigo-600 hover:text-white transition-all disabled:opacity-50">
-                    {loadingAudio === `step-${i}` ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : 'Recite'}
+                  <button onClick={() => handleSpeak(step.recitation, `${selectedPrayer.name}-step-${i}`)} className="px-6 py-3 rounded-xl bg-slate-900 border border-white/5 text-[10px] font-black uppercase tracking-widest text-indigo-400 hover:bg-indigo-600 hover:text-white transition-all disabled:opacity-50 h-fit">
+                    {loadingAudio === `${selectedPrayer.name}-step-${i}` ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : 'Recite'}
                   </button>
                 </div>
               ))}
+              
+              {/* Sajda-e-Dua Section */}
+              {selectedPrayer.sajdaDua && (
+                <div className="mt-12 space-y-4">
+                  <div className="flex items-center gap-4 border-b border-white/5 pb-4 mb-8">
+                     <span className="text-[10px] font-black text-indigo-500 uppercase tracking-widest">Post-Namaz Sajda-e-Dua</span>
+                     <div className="h-px flex-1 bg-white/5"></div>
+                  </div>
+                  {selectedPrayer.sajdaDua.map((step, i) => (
+                    <div key={`sajda-${i}`} className="glass rounded-2xl p-6 border border-emerald-500/10 flex flex-col gap-6 group hover:border-emerald-500/30 bg-emerald-500/[0.02]">
+                       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                         <div className="space-y-2">
+                           <div className="flex items-center gap-4">
+                             <span className="w-8 h-8 rounded-full bg-emerald-900/20 border border-emerald-500/20 flex items-center justify-center text-[10px] font-black text-emerald-400">{i+1}</span>
+                             <h3 className="text-xl font-black text-white group-hover:text-emerald-400 transition-colors">{step.step}</h3>
+                           </div>
+                           <p className="text-sm text-slate-500 ml-12 font-medium">{step.detail}</p>
+                         </div>
+                         <button onClick={() => handleSpeak(step.recitation, `sajda-${i}`)} className="px-6 py-3 rounded-xl bg-slate-900 border border-emerald-500/20 text-[10px] font-black uppercase tracking-widest text-emerald-400 hover:bg-emerald-600 hover:text-white transition-all shrink-0 self-start md:self-center">
+                           {loadingAudio === `sajda-${i}` ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : 'Recite Full Dua'}
+                         </button>
+                       </div>
+                       
+                       <div className="space-y-4 border-t border-white/5 pt-4">
+                          <p className="text-2xl md:text-3xl font-serif text-white rtl text-right leading-loose whitespace-pre-wrap">{step.recitation}</p>
+                          {step.roman && (
+                            <div className="space-y-1">
+                              <p className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Transliteration</p>
+                              <p className="text-xs text-slate-400 italic leading-relaxed">{step.roman}</p>
+                            </div>
+                          )}
+                          {step.meaning && (
+                            <div className="space-y-1">
+                              <p className="text-[9px] font-black text-indigo-500 uppercase tracking-widest">Meaning</p>
+                              <p className="text-xs text-slate-300 font-medium leading-relaxed">{step.meaning}</p>
+                            </div>
+                          )}
+                       </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Tariqa Video Section */}
@@ -427,14 +517,15 @@ const GuideView: React.FC = () => {
               </div>
               <div className="glass rounded-[2.5rem] overflow-hidden border border-white/10 shadow-2xl relative aspect-video bg-black flex flex-col justify-center group">
                 {videoError ? (
-                  <div className="w-full h-full flex flex-col items-center justify-center bg-slate-900/50 backdrop-blur-md text-slate-400 p-8 text-center gap-4 border border-white/5 animate-in fade-in duration-700">
+                  <div className="w-full h-full flex flex-col items-center justify-center bg-slate-900/50 backdrop-blur-md text-slate-400 p-8 text-center gap-4 border border-white/5 animate-in fade-in duration-700 overflow-y-auto">
                      <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center text-indigo-400 mb-2">
                        <svg className="w-8 h-8 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                      </div>
                      <div>
                        <h4 className="text-lg font-bold text-white mb-1">Instructional Video Unavailable</h4>
-                       <p className="text-sm text-slate-500">The guide video could not be loaded.</p>
+                       <p className="text-sm text-slate-500">{videoErrorMessage || "The guide video could not be loaded."}</p>
                      </div>
+                     
                      <div className="mt-4 p-4 rounded-xl bg-black/40 border border-white/5 text-left max-w-md mx-auto">
                         <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Developer Note</p>
                         <p className="text-xs text-slate-400 font-mono leading-relaxed">
@@ -443,8 +534,9 @@ const GuideView: React.FC = () => {
                           Note: Filenames are case-sensitive.
                         </p>
                      </div>
+
                      <button 
-                       onClick={() => { setVideoError(false); if(videoRef.current) { videoRef.current.load(); } }} 
+                       onClick={() => { setVideoError(false); setVideoErrorMessage(null); if(videoRef.current) { videoRef.current.load(); } }} 
                        className="mt-4 px-6 py-2 rounded-full bg-white/5 hover:bg-white/10 text-white text-xs font-bold uppercase tracking-widest transition-all"
                      >
                        Retry Connection

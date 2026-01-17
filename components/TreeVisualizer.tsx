@@ -3,8 +3,6 @@ import * as d3 from 'd3';
 import { Person, TreeType } from '../types';
 import { generateNodeBio } from '../services/geminiService';
 
-// Fix TS2430: We use Omit to remove the original 'children' definition from Person
-// so we can redefine it to allow 'null' (which D3 uses for collapsed nodes).
 interface ExtendedPerson extends Omit<Person, 'children'> {
   isRevealed?: boolean;
   _children?: ExtendedPerson[] | null;
@@ -28,7 +26,6 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ data, type }) => {
   const [aiInsight, setAiInsight] = useState('');
   const [isInitialRender, setIsInitialRender] = useState(true);
 
-  // Helper to prepare nested data structure
   const prepareData = useCallback((node: Person): ExtendedPerson => {
     const newNode = { ...node } as ExtendedPerson;
     newNode.isRevealed = false;
@@ -116,7 +113,8 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ data, type }) => {
     const theme = { color: '#3b82f6', bg: '#1d4ed8' };
     const isMobile = width < 768;
     
-    const horizontalGap = isMobile ? 650 : 1350; 
+    // Significantly increased mobile horizontal gap to 1200 to strictly prevent Branch overlap
+    const horizontalGap = isMobile ? 1200 : 1350; 
     const verticalGap = isMobile ? 250 : 400;
 
     const treeLayout = d3.tree<ExtendedPerson>().nodeSize([horizontalGap, verticalGap]);
@@ -124,7 +122,7 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ data, type }) => {
     setCurrentHierarchy(root);
 
     if (isInitialRender) {
-      const initialScale = isMobile ? 0.35 : 0.5;
+      const initialScale = isMobile ? 0.3 : 0.5;
       const initialTransform = d3.zoomIdentity
         .translate(width / 2, height / 3) 
         .scale(initialScale);
@@ -294,7 +292,6 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ data, type }) => {
     setIsSpouseSelected(side === 'spouse');
     setAiInsight('');
     
-    // Zoom to node but DO NOT auto-expand the side panel
     centerNode(d.x, d.y, 0.9);
 
     setLoadingAi(true);
@@ -328,7 +325,6 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ data, type }) => {
         <svg ref={svgRef} className="w-full h-full cursor-grab active:cursor-grabbing" style={{ touchAction: 'none' }} />
       </div>
       
-      {/* Zoom Controls */}
       <div className="absolute bottom-6 left-6 md:bottom-8 md:left-8 flex flex-col gap-3 z-10 pointer-events-auto">
         <button 
           onClick={jumpToTop} 
@@ -346,12 +342,10 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ data, type }) => {
         </button>
       </div>
 
-      {/* Sliding Detail Drawer */}
       {selectedNode && (
         <div 
           className={`absolute right-0 top-0 bottom-0 md:w-[400px] w-full z-40 transition-transform duration-500 ease-in-out flex ${isPanelExpanded ? 'translate-x-0' : 'translate-x-full'}`}
         >
-          {/* Toggle Handle (Arrow Button) */}
           <div className="absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 flex items-center">
             <button
               onClick={() => setIsPanelExpanded(!isPanelExpanded)}
@@ -370,7 +364,6 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ data, type }) => {
             </button>
           </div>
 
-          {/* Panel Content */}
           <div className="w-full bg-slate-900/95 md:bg-slate-900/90 backdrop-blur-2xl border-l border-white/10 h-full p-6 overflow-y-auto flex flex-col gap-6 shadow-2xl">
              <div className="flex justify-between items-start">
                 <div className="flex-1">

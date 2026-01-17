@@ -54,6 +54,15 @@
   background: rgba(255, 255, 255, 0.2);
 }
 
+/* Utility to hide scrollbars */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* Loading Message Styles */
 #loading-message {
     position: fixed;
