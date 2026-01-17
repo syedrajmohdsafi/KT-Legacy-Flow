@@ -67,7 +67,7 @@ const WAZU_STEPS = [
   { 
     name: "Feet", 
     detail: "Wash feet up to the ankles 3 times.", 
-    arabic: "اَللَّهُمَّ ثَبِّتْ قَدَمَيَّ عَلَى الصِّرَاطِ يَوْمَ تَزِلُّ فِيهِ الْأَقْدَامُ",
+    arabic: "اَللَّهُمَّ ثَبِّتْ قَدَمَيَّ عَلَى الصِّرَاطِ يَوْمَ تَزِلُّ فِيهِ الْأَعْلَى",
     roman: "Allahumma thabbit qadamayya 'alas-sirati yawma tazillu fihil aqdam.",
     img: "https://www.mymasjid.ca/wp-content/uploads/2016/10/wudu-wash-feet.png" 
   },
@@ -186,7 +186,7 @@ const SURAHS = [
     name: "Surah Al-Qari'ah",
     meaning: "The Striking Hour",
     arabic: "الْقَارِعَةُ (1) مَا الْقَارِعَةُ (2) وَمَا أَدْرَاكَ مَا الْقَارِعَةُ (3) يَوْمَ يَكُونُ النَّاسُ كَالْفَرَاشِ الْمَبْثُوثِ (4) وَتَكُونُ الْجِبَالُ كَالْعِهْنِ الْمَنْفُوشِ (5)",
-    roman: "Al qaari'ah. Mal qaari'ah. Wa maaa adraaka mal qaari'ah. Yauma yakoonun naasu kalfaraashil mabthooth. Wa takoonul jibaalu kal'ihnil manfoosh."
+    roman: "Al qaari'ah. Mal qaari'ah. Wa maaa adraaka mal qaari'ah. Yauma yakoonun naasu kalfaraashil mabthooth. Wa takeonul jibaalu kal'ihnil manfoosh."
   },
   {
     name: "Surah Al-Adiyat",
@@ -230,7 +230,7 @@ const DAILY_PRAYERS = [
       { 
         step: "1st Rakat Recitation", 
         detail: "Recite Surah Al-Fatiha followed by Ayah 135 of Surah Aal-Imran: وَالَّذِينَ إِذَا فَعَلُوا فَاحِشَةً أَوْ ظَلَمُوا أَنْفُسَهُمْ ذَكَرُوا اللَّهَ فَاسْتَغْفَرُوا لِذُنُوبِهِمْ وَمَنْ يَغْفِرُ الذُّنُوبَ إِلَّا اللَّهُ وَلَمْ يُصِرُّوا عَلَىٰ مَا فَعَلُوا وَهُمْ يَعْلَمُونَ", 
-        recitation: "وَالَّذِينَ إِذَا فَعَلُوا فَاحِشَةً أَوْ ظَلَمُوا أَنْفُسَهُمْ ذَكَرُوا اللَّهَ فَاسْتَغْفَرُوا لِذُنُوبِهِمْ وَمَنْ يَغْفِرُ الذُّنُوبَ إِلَّا اللَّهُ وَلَمْ يُصِرُّوا عَلَىٰ مَا فَعَلُوا وَهُمْ يَعْلَمُونَ"
+        recitation: "وَالَّذِينَ إِذَا فَعَلُوا فَاحِشَةً أَوْ ظَلَمُوا أَنْفُسَهُمْ ذَكَرُوا اللَّهَ فَاسْتَغْفَرُوا لِذُنُوبِهِمْ وَمَنْ يَغْفِرُ الذُّنُوبَ إِلَّا اللَّهُ وَلَمْ يُصِرُّوا عَلَىٰ مَا فَعَلُوا وَهُمْ يَعْلَمُونَ"
       },
       { 
         step: "2nd Rakat Recitation", 
@@ -333,12 +333,17 @@ const GuideView: React.FC = () => {
   const handleSpeak = async (text: string, id: string) => {
     if (loadingAudio) return;
     setLoadingAudio(id);
+
     try {
+      // AudioContext initialization and API call handled centrally in the service
       const audio = await speakText(text);
-      if (audio) await playRawPCM(audio);
-    } catch (err) {
+      if (audio) {
+        await playRawPCM(audio);
+      }
+    } catch (err: any) {
       console.error("Recitation error:", err);
-      alert("Failed to play recitation. Please check your network or API key.");
+      // Inform the user about the failure with the specific error message
+      alert(`Recitation failed: ${err.message || "Please check your internet connection or API key selection."}`);
     } finally {
       setLoadingAudio(null);
     }
@@ -455,13 +460,18 @@ const GuideView: React.FC = () => {
                       <h3 className="text-xl font-black text-white group-hover:text-indigo-400 transition-colors">{step.step}</h3>
                     </div>
                     <p className="text-sm text-slate-500 ml-12 font-medium leading-relaxed">{step.detail}</p>
-                    {/* Special display for recitations like Tahiyyatul-wazu's Ayahs */}
-                    {selectedPrayer.name === "Tahiyyatul-wazu" && step.step.includes("Recitation") && (
-                      <div className="ml-12 mt-4 p-5 bg-white/5 rounded-2xl border border-white/5 shadow-inner">
-                        <p className="text-2xl md:text-3xl font-serif text-white rtl text-right leading-loose">
-                          {step.recitation}
-                        </p>
-                        <p className="text-[10px] font-black text-indigo-500 uppercase tracking-widest mt-4">Visible Arabic Text for Step</p>
+                    
+                    {/* Arabic version of specific ayahs directly in the Tariqa steps */}
+                    {selectedPrayer.name === "Tahiyyatul-wazu" && (step.step.includes("Recitation")) && (
+                      <div className="ml-12 mt-4 p-6 bg-indigo-900/20 rounded-2xl border border-indigo-500/20 shadow-xl overflow-hidden animate-in zoom-in duration-500">
+                         <p className="text-2xl md:text-4xl font-serif text-white rtl text-right leading-[1.8] whitespace-pre-wrap">
+                           {step.recitation}
+                         </p>
+                         <div className="flex items-center gap-2 mt-4 text-indigo-400">
+                           <div className="h-px flex-1 bg-indigo-500/20"></div>
+                           <span className="text-[9px] font-black uppercase tracking-[0.2em] whitespace-nowrap">Full Arabic Text to Recite</span>
+                           <div className="h-px flex-1 bg-indigo-500/20"></div>
+                         </div>
                       </div>
                     )}
                   </div>

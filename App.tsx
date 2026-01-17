@@ -99,7 +99,6 @@ const SilsilaView: React.FC = () => {
   const [activeSubtitleIdx, setActiveSubtitleIdx] = useState(-1);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Expanded translation list for the live display panel
   const translations = [
     { start: 0, end: 5, text: "In the name of Allah, the Most Gracious, the Most Merciful" },
     { start: 5, end: 12, text: "My body is the Murshid's body, my heart is the Murshid's heart" },
@@ -140,10 +139,14 @@ const SilsilaView: React.FC = () => {
     if (loadingAudio !== null) return;
     setLoadingAudio(id);
     try {
+      // AudioContext resume is handled inside playRawPCM, which is called after speakText
       const audio = await speakText(text);
-      if (audio) await playRawPCM(audio);
-    } catch (err) {
+      if (audio) {
+        await playRawPCM(audio);
+      }
+    } catch (err: any) {
       console.error("Recitation error:", err);
+      alert(`Recitation failed: ${err.message || "Unknown error"}`);
     } finally {
       setLoadingAudio(null);
     }
