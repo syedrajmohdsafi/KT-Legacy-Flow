@@ -185,7 +185,7 @@ const SURAHS = [
   {
     name: "Surah Al-Qari'ah",
     meaning: "The Striking Hour",
-    arabic: "الْقَارِعَةُ (1) مَا الْقَارِعَةُ (2) وَمَا أَدْرَاكَ مَا الْقَارِعَةُ (3) يَوْمَ يَكُونُ النَّاسُ كَالْفَرَاشِ الْمَبْثُوثِ (4) وَتَكُونُ الْجِبَالُ كَالْعِهْنِ الْمَنْفُوشِ (5)",
+    arabic: "الْقَارِعَةُ (1) مَا الْقَارِعَةُ (2) وَمَا أَدْرَاكَ مَا الْقَارِعَةُ (3) يَوْمَ يَكُونُ النَّاسُ كَالْفَرَاشِ الْمَبْثُوثِ (4) وَتَكُونُ الْجِبَالُ كَالْعِهْنِ الْمَنْفوشِ (5)",
     roman: "Al qaari'ah. Mal qaari'ah. Wa maaa adraaka mal qaari'ah. Yauma yakoonun naasu kalfaraashil mabthooth. Wa takeonul jibaalu kal'ihnil manfoosh."
   },
   {

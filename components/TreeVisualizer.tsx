@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import * as d3 from 'd3';
 import { Person, TreeType } from '../types';
@@ -299,7 +300,8 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ data, type }) => {
     const targetRole = side === 'spouse' ? d.data.spouseRole : d.data.role;
     if (targetName) {
       try {
-        const bio = await generateNodeBio(targetName, targetRole || '', 'family');
+        // Fix: generateNodeBio only expects name and role as arguments. Removed the third 'family' argument.
+        const bio = await generateNodeBio(targetName, targetRole || '');
         setAiInsight(bio);
       } catch (err: any) {
         setAiInsight("History record available in archives.");
