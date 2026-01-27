@@ -5,7 +5,7 @@ import TreeVisualizer from './components/TreeVisualizer';
 import GuideView from './components/GuideView';
 import { TreeType } from './types';
 import { PATERNAL_ANCESTRY, MATERNAL_ANCESTRY, SHAJRA_DATA } from './constants';
-import { speakText, playRawPCM } from './services/geminiService';
+import { speakText, playRawPCM, initAudioContext, speakWithBrowser } from './services/geminiService';
 
 const HomeView: React.FC = () => {
   const tiles = [
@@ -139,14 +139,16 @@ const SilsilaView: React.FC = () => {
     if (loadingAudio !== null) return;
     setLoadingAudio(id);
     try {
-      // AudioContext resume is handled inside playRawPCM, which is called after speakText
+      await initAudioContext();
       const audio = await speakText(text);
       if (audio) {
         await playRawPCM(audio);
+      } else {
+        await speakWithBrowser(text);
       }
     } catch (err: any) {
-      console.error("Recitation error:", err);
-      alert(`Recitation failed: ${err.message || "Unknown error"}`);
+      console.error("Audio error:", err);
+      try { await speakWithBrowser(text); } catch(e) {}
     } finally {
       setLoadingAudio(null);
     }

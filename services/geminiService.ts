@@ -4,7 +4,6 @@ let sharedAudioContext: AudioContext | null = null;
 
 /**
  * Manually decode a base64 string into a Uint8Array.
- * Essential for environments without native Buffer support.
  */
 function decodeBase64(base64: string): Uint8Array {
   const binaryString = atob(base64);
@@ -17,7 +16,7 @@ function decodeBase64(base64: string): Uint8Array {
 }
 
 /**
- * Decodes raw 16-bit PCM data into an AudioBuffer for the Web Audio API.
+ * Decodes raw 16-bit PCM data into an AudioBuffer.
  */
 async function decodePCM(
   data: Uint8Array,
@@ -32,7 +31,6 @@ async function decodePCM(
   for (let channel = 0; channel < numChannels; channel++) {
     const channelData = buffer.getChannelData(channel);
     for (let i = 0; i < frameCount; i++) {
-      // Normalizing 16-bit signed PCM [-32768, 32767] to float [-1.0, 1.0]
       channelData[i] = dataInt16[i * numChannels + channel] / 32768.0;
     }
   }
@@ -40,10 +38,9 @@ async function decodePCM(
 }
 
 /**
- * Returns a shared, resumed AudioContext. 
- * Browsers require a user gesture to resume the context.
+ * Wakes up or creates the AudioContext.
  */
-const getAudioContext = async () => {
+export async function initAudioContext() {
   if (!sharedAudioContext) {
     sharedAudioContext = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
   }
@@ -51,118 +48,97 @@ const getAudioContext = async () => {
     await sharedAudioContext.resume();
   }
   return sharedAudioContext;
-};
-
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-/**
- * Executes a function with automatic retries for quota-related errors.
- * Re-instantiates GoogleGenAI on every attempt to ensure the latest API key is used.
- */
-async function executeWithRetry<T>(fn: (ai: GoogleGenAI) => Promise<T>, retries = 2, baseDelay = 2000): Promise<T> {
-  let attempt = 0;
-  while (attempt <= retries) {
-    try {
-      const apiKey = process.env.API_KEY;
-      if (!apiKey) {
-        throw new Error("API Key is missing. Please ensure your project is configured with a valid Gemini API key.");
-      }
-      const ai = new GoogleGenAI({ apiKey });
-      return await fn(ai);
-    } catch (error: any) {
-      console.error(`Gemini Service Error (Attempt ${attempt + 1}):`, error);
-      
-      if (error?.message?.includes('Requested entity was not found')) {
-         throw new Error("API Key or project configuration error. Please re-select your API key.");
-      }
-
-      const isQuotaError = 
-        error?.message?.includes('429') || 
-        error?.status === 429 || 
-        error?.message?.toLowerCase().includes('quota') ||
-        error?.message?.toLowerCase().includes('resource_exhausted');
-
-      if (isQuotaError && attempt < retries) {
-        attempt++;
-        const waitTime = (baseDelay * Math.pow(2, attempt)) + (Math.random() * 1000);
-        console.warn(`Quota reached. Retrying in ${Math.round(waitTime)}ms...`);
-        await delay(waitTime);
-        continue;
-      }
-      throw error;
-    }
-  }
-  throw new Error("Maximum retries reached for the request.");
 }
 
-export async function generateNodeBio(name: string, role: string, context: 'family' | 'knowledge' | 'dua') {
-  return executeWithRetry(async (ai) => {
-    let prompt = `Generate a short, intriguing 2-sentence historical biography for ${name}, who is a ${role}. Focus on legacy and heritage.`;
-    const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
-      contents: prompt,
-    });
-    return response.text?.trim() || "No further details available in the archives.";
+/**
+ * Alternative: Browser Native Speech Synthesis.
+ * This works offline and doesn't require an API key.
+ */
+export function speakWithBrowser(text: string): Promise<void> {
+  return new Promise((resolve) => {
+    // Cancel any ongoing speech
+    window.speechSynthesis.cancel();
+    
+    const utterance = new SpeechSynthesisUtterance(text);
+    // Detect if text is Arabic to choose right voice if available
+    if (/[\u0600-\u06FF]/.test(text)) {
+      utterance.lang = 'ar-SA';
+    } else {
+      utterance.lang = 'en-US';
+    }
+    
+    utterance.rate = 0.9;
+    utterance.onend = () => resolve();
+    utterance.onerror = () => resolve(); // Resolve anyway to clean up loading states
+    
+    window.speechSynthesis.speak(utterance);
   });
 }
 
 /**
- * Generates audio bytes from text using the Gemini TTS model.
+ * Executes Gemini API calls with minimal retries for speed.
+ */
+async function executeApiCall<T>(fn: (ai: GoogleGenAI) => Promise<T>): Promise<T> {
+  const apiKey = process.env.API_KEY;
+  if (!apiKey) throw new Error("Key Missing");
+  const ai = new GoogleGenAI({ apiKey });
+  return await fn(ai);
+}
+
+/**
+ * Historical bio generation.
+ */
+export async function generateNodeBio(name: string, role: string, context: 'family' | 'knowledge' | 'dua') {
+  try {
+    return await executeApiCall(async (ai) => {
+      const response = await ai.models.generateContent({
+        model: 'gemini-3-flash-preview',
+        contents: `Generate a short, intriguing 2-sentence historical biography for ${name}, who is a ${role}.`,
+      });
+      return response.text?.trim() || "Details archived.";
+    });
+  } catch (e) {
+    return "Historical record remains preserved in the family archives.";
+  }
+}
+
+/**
+ * Generates AI audio.
  */
 export async function speakText(text: string): Promise<string | null> {
-  return executeWithRetry(async (ai) => {
-    console.debug("Requesting TTS for:", text.substring(0, 30) + "...");
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash-preview-tts",
-      contents: [{ parts: [{ text: text }] }],
-      config: {
-        // Use string literal for maximum compatibility in different SDK versions
-        responseModalities: ['AUDIO'],
-        speechConfig: {
-          voiceConfig: {
-            prebuiltVoiceConfig: { voiceName: 'Kore' },
+  try {
+    return await executeApiCall(async (ai) => {
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash-preview-tts",
+        contents: [{ parts: [{ text: text }] }],
+        config: {
+          responseModalities: ['AUDIO'],
+          speechConfig: {
+            voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } },
           },
         },
-      },
+      });
+      return response.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data || null;
     });
-
-    const candidate = response.candidates?.[0];
-    const audioPart = candidate?.content?.parts?.find(p => p.inlineData);
-    
-    if (audioPart?.inlineData?.data) {
-      console.debug("TTS successfully generated audio bytes.");
-      return audioPart.inlineData.data;
-    }
-    
-    console.error("TTS Response received but contained no audio data.", response);
-    throw new Error("The AI generated a response but no audio was returned. Please try again.");
-  });
+  } catch (e) {
+    console.warn("Gemini TTS failed, falling back to browser speech.");
+    return null; // Signals to use fallback
+  }
 }
 
 /**
- * Plays raw PCM audio bytes encoded in base64 using the Web Audio API.
+ * Plays the AI generated PCM audio.
  */
 export async function playRawPCM(base64: string): Promise<void> {
-  const ctx = await getAudioContext();
-  
-  // Browsers require user gesture to resume. Even if handled in handleSpeak, it's safe to check here.
-  if (ctx.state === 'suspended') {
-    await ctx.resume();
-  }
-
+  const ctx = await initAudioContext();
   const audioBytes = decodeBase64(base64);
   const audioBuffer = await decodePCM(audioBytes, ctx, 24000, 1);
 
-  return new Promise((resolve, reject) => {
-    try {
-      const source = ctx.createBufferSource();
-      source.buffer = audioBuffer;
-      source.connect(ctx.destination);
-      source.onended = () => resolve();
-      source.start(0);
-    } catch (err) {
-      console.error("Audio Playback Error:", err);
-      reject(err);
-    }
+  return new Promise((resolve) => {
+    const source = ctx.createBufferSource();
+    source.buffer = audioBuffer;
+    source.connect(ctx.destination);
+    source.onended = () => resolve();
+    source.start(0);
   });
 }

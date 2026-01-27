@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { speakText, playRawPCM } from '../services/geminiService';
+import { speakText, playRawPCM, initAudioContext, speakWithBrowser } from '../services/geminiService';
 
 const WAZU_NIYYAH = {
   arabic: "نَوَيْتُ أَنْ أَتَوضَّأَ لِلَّهِ تَعَالَى تَقَرُّبًا إِلَيْهِ",
@@ -138,7 +138,7 @@ const SURAHS = [
     name: "Surah Al-Kafirun",
     meaning: "The Disbelievers",
     arabic: "قُلْ يَا أَيُّهَا الْكَافِرُونَ (1) لَا أَعْبُدُ مَا تَعْبُدُونَ (2) وَلَا أَنتُمْ عَابِدُونَ مَا أَعْبُدُ (3) وَلَا أَنَا عَابِدٌ مَّا عَدَتُّمْ (4) وَلَا أَنتُمْ عَابِدُونَ مَا أَعْبُدُ (5) لَكُمْ دِينُكُمْ وَلِيَ دِينِ (6)",
-    roman: "Qul yaa ayyuhal kaafiroon. Laa a'budu maa ta'budoon. Wa laa antum 'aabidoona maaa a'bud. Wa laaa ana 'aabidum maa 'abattum. Wa laaa antum 'aabidoona maaa a'bud. Lakum deenukum wa liya deen."
+    roman: "Qul yaa ayyhal kaafiroon. Laa a'budu maa ta'budoon. Wa laa antum 'aabidoona maaa a'bud. Wa laaa ana 'aabidum maa 'abattum. Wa laaa antum 'aabidoona maaa a'bud. Lakum deenukum wa liya deen."
   },
   {
     name: "Surah Al-Kauthar",
@@ -155,7 +155,7 @@ const SURAHS = [
   {
     name: "Surah Quraish",
     meaning: "The Quraish",
-    arabic: "لِإِيلَافِ قُرَيْشٍ (1) إِيلَافِهِمْ رِحْلَةَ الشِّتَاءِ وَالصَّيْفِ (2) فَلْيَعْبُدُوا رَبَّ هَذَا الْبَيْتِ (3) الَّذِي أَطْعَمَهُم مِّن جُوعٍ وَآمَنَهُم مِّنْ خَوْفٍ (4)",
+    arabic: "لِإِيلَافِ قُرَيْشٍ (1) إِيلَافِهِمْ رِحْلَةَ الشِّتَاءِ وَالصَّيْفِ (2) فَلْيَعْبُدُوا رَبَّ هَذَا الْبَيْتِ (3) الَّذِي أَطْعَمَهُم مِّن جوعٍ وَآمَنَهُم مِّنْ خَوْفٍ (4)",
     roman: "Li eelaafi quraish. Eelaafihim rihlatash shitaaa'i wassaif. Falya'budoo rabba haadhal bait. Alladhee at'amahum min joo'inw wa aamanahum min khauf."
   },
   {
@@ -203,7 +203,7 @@ const SURAHS = [
   {
     name: "Surah Al-Bayyinah",
     meaning: "The Clear Evidence",
-    arabic: "لَمْ يَكُنِ الَّذِينَ كَفَرُوا مِنْ أَهْلِ الْكِتَابِ وَالْمُشْرِكِينَ مُنفَكِّينَ حَتَّى تَأْتِيَهُمُ الْبَيِّنَةُ (1) رَسُولٌ مِّنَ اللَّهِ يَتْلُو صُحُفًا مُّطَهَّرَةً (2)",
+    arabic: "لَمْ يَكُنِ الَّذِينَ كَفَرُوا مِنْ أَهْلِ الْكِتَابِ وَالْمُشْرِکِينَ مُنفَكِّينَ حَتَّى تَأْتِيَهُمُ الْبَيِّنَةُ (1) رَسُولٌ مِّنَ اللَّهِ يَتْلُو صُحُفًا مُّطَهَّرَةً (2)",
     roman: "Lam yakunil ladheena kafaroo min ahlil kitaabi wal mushrikeena munfakkeena hattaa ta'tiyahumul baiyinah. Rasoolum minal laahi yetloo suhufam mutahharah."
   },
   {
@@ -335,15 +335,25 @@ const GuideView: React.FC = () => {
     setLoadingAudio(id);
 
     try {
-      // AudioContext initialization and API call handled centrally in the service
+      // Step 1: Immediately init audio context on user gesture
+      await initAudioContext();
+
+      // Step 2: Try AI Audio
       const audio = await speakText(text);
       if (audio) {
         await playRawPCM(audio);
+      } else {
+        // Step 3: Fallback if AI fails (Alternative requested)
+        await speakWithBrowser(text);
       }
     } catch (err: any) {
-      console.error("Recitation error:", err);
-      // Inform the user about the failure with the specific error message
-      alert(`Recitation failed: ${err.message || "Please check your internet connection or API key selection."}`);
+      console.error("Audio error:", err);
+      // Final fail-safe: Try browser speech one last time if everything crashes
+      try {
+        await speakWithBrowser(text);
+      } catch (e) {
+        console.error("Critical Audio Failure");
+      }
     } finally {
       setLoadingAudio(null);
     }
@@ -356,7 +366,6 @@ const GuideView: React.FC = () => {
         const error = videoElement.error;
         const errorMsg = error.message ? String(error.message) : "Network or file issue";
         msg = `Video Error (Code ${error.code}): ${errorMsg}`;
-        console.error("Video Error Details:", error);
     }
     setVideoErrorMessage(msg);
     setVideoError(true);
@@ -428,7 +437,6 @@ const GuideView: React.FC = () => {
 
         {activeTab === 'prayers' && (
           <div className="space-y-12 animate-in fade-in slide-in-from-bottom duration-500">
-            {/* Prayer Selection Bar: Horizontal Scroll on Mobile */}
             <div className="flex flex-row flex-nowrap overflow-x-auto pb-4 gap-4 md:grid md:grid-cols-6 md:overflow-x-visible md:pb-0 snap-x scrollbar-hide">
               {DAILY_PRAYERS.map((p, i) => (
                 <button 
@@ -461,7 +469,6 @@ const GuideView: React.FC = () => {
                     </div>
                     <p className="text-sm text-slate-500 ml-12 font-medium leading-relaxed">{step.detail}</p>
                     
-                    {/* Arabic version of specific ayahs directly in the Tariqa steps */}
                     {selectedPrayer.name === "Tahiyyatul-wazu" && (step.step.includes("Recitation")) && (
                       <div className="ml-12 mt-4 p-6 bg-indigo-900/20 rounded-2xl border border-indigo-500/20 shadow-xl overflow-hidden animate-in zoom-in duration-500">
                          <p className="text-2xl md:text-4xl font-serif text-white rtl text-right leading-[1.8] whitespace-pre-wrap">
@@ -481,7 +488,6 @@ const GuideView: React.FC = () => {
                 </div>
               ))}
               
-              {/* Sajda-e-Dua Section */}
               {selectedPrayer.sajdaDua && (
                 <div className="mt-12 space-y-4">
                   <div className="flex items-center gap-4 border-b border-white/5 pb-4 mb-8">
@@ -524,7 +530,6 @@ const GuideView: React.FC = () => {
               )}
             </div>
 
-            {/* Tariqa Video Section */}
             <div className="mt-16 pt-12 border-t border-white/10">
               <div className="text-center mb-8">
                 <h3 className="text-3xl font-black text-white tracking-tighter uppercase">Salah Method (Tareeka) Video</h3>
@@ -540,16 +545,6 @@ const GuideView: React.FC = () => {
                        <h4 className="text-lg font-bold text-white mb-1">Instructional Video Unavailable</h4>
                        <p className="text-sm text-slate-500">{videoErrorMessage || "The guide video could not be loaded."}</p>
                      </div>
-                     
-                     <div className="mt-4 p-4 rounded-xl bg-black/40 border border-white/5 text-left max-w-md mx-auto">
-                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Developer Note</p>
-                        <p className="text-xs text-slate-400 font-mono leading-relaxed">
-                          Please ensure the file <span className="text-indigo-400">Hazrat-Peer-o-Murshid-practical-tareeqe.mp4</span> exists in your <span className="text-white">public/videos/</span> directory.
-                          <br/><br/>
-                          Note: Filenames are case-sensitive.
-                        </p>
-                     </div>
-
                      <button 
                        onClick={() => { setVideoError(false); setVideoErrorMessage(null); if(videoRef.current) { videoRef.current.load(); } }} 
                        className="mt-4 px-6 py-2 rounded-full bg-white/5 hover:bg-white/10 text-white text-xs font-bold uppercase tracking-widest transition-all"
